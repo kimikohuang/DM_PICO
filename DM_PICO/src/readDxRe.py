@@ -1,9 +1,12 @@
 #!/usr/bin/python
 import re
-import csv
+#import csv
 import logging
+import random
+import nltk
+from nltk.corpus import movie_reviews
 
-PubmedFile= '/home/kimiko/Downloads/clinical query/_pure-doc-set/'+'pure-doc-dx (copy).txt'
+
 
 flagTi = False
 myTI = ''
@@ -26,6 +29,8 @@ p = re.compile(myRe)
 #r"(Abstract: .*)"
 #)
 #exit()
+filesInput = ['pure-doc-dx (copy).txt', 'pure-doc-tx (copy).txt']
+PubmedFile= '/home/kimiko/Downloads/clinical query/_pure-doc-set/'+'pure-doc-dx (copy).txt'
 with open(PubmedFile) as fTxtOrg:
 #        with open(DirMain+os.path.basename(dfile)[0:4]+'W'+os.path.basename(dfile)[5:-4]+'.txt') as fTxtOrg:
     listDocOrg = fTxtOrg.readlines()
@@ -38,15 +43,15 @@ with open(PubmedFile) as fTxtOrg:
 #    numTopics = len(aList)
 #print len(aList)
 #sum = numpy.fromstring(aList[0],sep=' ') - numpy.fromstring(aList[0],sep=' ')
-for myString in listDocOrg[0:100]:
-#for myString in listDocOrg:
-    myResult = p.search(myString)
-    if myResult <> None:
+#for myString in listDocOrg[0:100]:
+##for myString in listDocOrg:
+#    myResult = p.search(myString)
+#    if myResult <> None:
 #        print "Not found."
 #    else:
-#        print 'myResult: ', re.sub('^Title: |^Abstract: ','',myResult.group()
-        print 'myResult: ', re.sub('^Title: |^Abstract: ','',myResult.group())
-
+#        print 'myResult: ', re.sub('^Title: |^Abstract: ','',myResult.group())
+documents = []
+listMyWords = []
 with open('/home/kimiko/output.csv', 'wb') as outf:
 #    outcsv = csv.writer(outf)
 #    outcsv = csv.writer(outf)
@@ -62,13 +67,51 @@ with open('/home/kimiko/output.csv', 'wb') as outf:
     #    else:
     #        print 'myResult: ', re.sub('^Title: |^Abstract: ','',myResult.group()
             myData = re.sub('^Title: |^Abstract: ','',myResult.group())
-            print 'myResult: ', myData
+#            print 'myResult: ', myData
 #            outcsv.writerow([myData, 'dx'])
 #            outcsv.writerow([myData])
             outf.write(myData)
-            print myData.split()
+            listMyWords.extend(myData.split())
+            documents.append((myData.split(),'dx'))
+print len(documents), myData.split()
+print 'len(listMyWords): ', len(listMyWords)
+#exit()
 
-        
+
+
+#myWords. = [(list(movie_reviews.words(fileid)), category)
+#             for category in movie_reviews.categories()
+#             for oneRow[0] in listMy.fileids(category)]
+
+#all_words = nltk.FreqDist(w.lower() for w in movie_reviews.words())
+all_words = nltk.FreqDist(listMyWords)
+print 'type(all_words): ', type(all_words)
+word_features = all_words.keys()[:len(all_words)/10]
+print 'word_features: ', type(word_features), word_features
+#exit()
+
+def document_features(document):
+    document_words = set(document)
+    features = {}
+    for word in word_features:
+        features['contains(%s)' % word] = (word in document_words)
+    return features
+
+print "movie_reviews.words('pos/cv957_8737.txt'):", movie_reviews.words('pos/cv957_8737.txt')
+print document_features(movie_reviews.words('pos/cv957_8737.txt'))
+
+
+featuresets = [(document_features(d), c) for (d,c) in documents]
+#train_set, test_set = featuresets[100:], featuresets[:100]
+sizeTest = len(documents)/10
+print 'sizeTest: ', sizeTest
+train_set, test_set = featuresets[sizeTest:], featuresets[:sizeTest]
+classifier = nltk.NaiveBayesClassifier.train(train_set)
+print nltk.classify.accuracy(classifier, test_set)
+#0.81
+classifier.show_most_informative_features(50)
+
+
 #         print myResult.group('tl')
 #    myFound = p.findall(myString)
 #    if len(myFound) > 0:
