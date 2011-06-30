@@ -30,49 +30,57 @@ p = re.compile(myRe)
 #)
 #exit()
 filesInput = ['pure-doc-dx (copy).txt', 'pure-doc-tx (copy).txt']
-PubmedFile= '/home/kimiko/Downloads/clinical query/_pure-doc-set/'+'pure-doc-dx (copy).txt'
-with open(PubmedFile) as fTxtOrg:
-#        with open(DirMain+os.path.basename(dfile)[0:4]+'W'+os.path.basename(dfile)[5:-4]+'.txt') as fTxtOrg:
-    listDocOrg = fTxtOrg.readlines()
-#    myString = fTxtOrg.readline()
-#    listDocOrg = fTxtOrg.readline()
-#   print '\n', myRe, myString, p.findall(myString)
-#    print 'len(listDocOrg): ', len(listDocOrg)
-#aList = theta.readlines()
-#if len(aList) == 0 :
-#    numTopics = len(aList)
-#print len(aList)
-#sum = numpy.fromstring(aList[0],sep=' ') - numpy.fromstring(aList[0],sep=' ')
-#for myString in listDocOrg[0:100]:
-##for myString in listDocOrg:
-#    myResult = p.search(myString)
-#    if myResult <> None:
-#        print "Not found."
-#    else:
-#        print 'myResult: ', re.sub('^Title: |^Abstract: ','',myResult.group())
+#for fileOne in filesInput:
+#    print fileOne[8:11] # '-dx, -tx'
+#exit()
 documents = []
 listMyWords = []
-with open('/home/kimiko/output.csv', 'wb') as outf:
-#    outcsv = csv.writer(outf)
-#    outcsv = csv.writer(outf)
-#    for myRow in data:
-#        print type(myRow), myRow[0], myRow
-#        outcsv.writerow([myRow[0], myRow[1]])
-##            outcsv.writerows(dataArray(data, 0, 'unitnames'))
-#    for myString in listDocOrg[0:100]:
-    for myString in listDocOrg:
-        myResult = p.search(myString)
-        if myResult <> None:
+dirMain = '/home/kimiko/Downloads/clinical query/_pure-doc-set/'
+
+for fileOne in filesInput:
+#    PubmedFile= '/home/kimiko/Downloads/clinical query/_pure-doc-set/'+'pure-doc-dx (copy).txt'
+    PubmedFile= dirMain+fileOne
+    with open(PubmedFile) as fTxtOrg:
+    #        with open(DirMain+os.path.basename(dfile)[0:4]+'W'+os.path.basename(dfile)[5:-4]+'.txt') as fTxtOrg:
+        listDocOrg = fTxtOrg.readlines()
+    #    myString = fTxtOrg.readline()
+    #    listDocOrg = fTxtOrg.readline()
+    #   print '\n', myRe, myString, p.findall(myString)
+    #    print 'len(listDocOrg): ', len(listDocOrg)
+    #aList = theta.readlines()
+    #if len(aList) == 0 :
+    #    numTopics = len(aList)
+    #print len(aList)
+    #sum = numpy.fromstring(aList[0],sep=' ') - numpy.fromstring(aList[0],sep=' ')
+    #for myString in listDocOrg[0:100]:
+    ##for myString in listDocOrg:
+    #    myResult = p.search(myString)
+    #    if myResult <> None:
     #        print "Not found."
     #    else:
-    #        print 'myResult: ', re.sub('^Title: |^Abstract: ','',myResult.group()
-            myData = re.sub('^Title: |^Abstract: ','',myResult.group())
-#            print 'myResult: ', myData
-#            outcsv.writerow([myData, 'dx'])
-#            outcsv.writerow([myData])
-            outf.write(myData)
-            listMyWords.extend(myData.split())
-            documents.append((myData.split(),'dx'))
+    #        print 'myResult: ', re.sub('^Title: |^Abstract: ','',myResult.group())
+    with open(dirMain+'output'+fileOne[8:11]+'.csv', 'wb') as outf:
+    #    outcsv = csv.writer(outf)
+    #    outcsv = csv.writer(outf)
+    #    for myRow in data:
+    #        print type(myRow), myRow[0], myRow
+    #        outcsv.writerow([myRow[0], myRow[1]])
+    ##            outcsv.writerows(dataArray(data, 0, 'unitnames'))
+    #    for myString in listDocOrg[0:100]:
+        for myString in listDocOrg:
+            myResult = p.search(myString)
+            if myResult <> None:
+        #        print "Not found."
+        #    else:
+        #        print 'myResult: ', re.sub('^Title: |^Abstract: ','',myResult.group()
+                myData = re.sub('^Title: |^Abstract: ','',myResult.group())
+    #            print 'myResult: ', myData
+    #            outcsv.writerow([myData, 'dx'])
+    #            outcsv.writerow([myData])
+                outf.write(myData)
+                listMyWords.extend(myData.split())
+                documents.append((myData.split(),fileOne[9:11]))
+random.shuffle(documents)
 print len(documents), myData.split()
 print 'len(listMyWords): ', len(listMyWords)
 #exit()
@@ -97,8 +105,12 @@ def document_features(document):
         features['contains(%s)' % word] = (word in document_words)
     return features
 
-print "movie_reviews.words('pos/cv957_8737.txt'):", movie_reviews.words('pos/cv957_8737.txt')
-print document_features(movie_reviews.words('pos/cv957_8737.txt'))
+#print "movie_reviews.words('pos/cv957_8737.txt'):", movie_reviews.words('pos/cv957_8737.txt')
+#print document_features(movie_reviews.words('pos/cv957_8737.txt'))
+
+favorDiagnostic = ['intervention', 'risk', 'therapy', 'disease', 'participants', 'effects', 'subjects', 'patient', 'response', 'outcomes', 'events','outcome', 'findings', 'performance', 'statistically', 'evaluation', 'population']
+print 'document_features(favorDiagnostic): ', document_features(favorDiagnostic)
+
 
 
 featuresets = [(document_features(d), c) for (d,c) in documents]
@@ -107,9 +119,9 @@ sizeTest = len(documents)/10
 print 'sizeTest: ', sizeTest
 train_set, test_set = featuresets[sizeTest:], featuresets[:sizeTest]
 classifier = nltk.NaiveBayesClassifier.train(train_set)
-print nltk.classify.accuracy(classifier, test_set)
+print '\nnltk.classify.accuracy(classifier, test_set): ', nltk.classify.accuracy(classifier, test_set)
 #0.81
-classifier.show_most_informative_features(50)
+classifier.show_most_informative_features(100)
 
 
 #         print myResult.group('tl')
