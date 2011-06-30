@@ -7,11 +7,11 @@ import nltk
 myRe = '((^Title: |^Abstract: )(.*))'
 p = re.compile(myRe)
 
-filesInput = ['pure-doc-dx (copy).txt', 'pure-doc-tx (copy).txt']
+filesInput = ['pure-doc-dx.txt', 'pure-doc-tx.txt']
 
 documents = []
 listMyWords = []
-dirMain = '/home/kimiko/Downloads/clinical query/_pure-doc-set/'
+dirMain = ''
 
 for fileOne in filesInput:
     PubmedFile= dirMain+fileOne
