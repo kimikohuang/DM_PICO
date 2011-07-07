@@ -1,4 +1,5 @@
 import csv, codecs, cStringIO
+import nltk
 
 #portfolio = csv.reader(open('/home/kimiko/output.csv', "rb"))
 #portfolio = csv.reader(open('intervention.xls', "rb"), dialect='excel')
@@ -17,22 +18,58 @@ def utf_8_encoder(unicode_csv_data):
 
 filesInput = ['intervention.csv', 'patient.csv', 'outcome.csv']
 dirMain = ''
+myStopwords = nltk.corpus.stopwords.words('english')
+ListNormalMethod = ['stpwRemoved', 'wnl', 'porter', 'lancaster']
+
+#myType = 'wnl-'
+myType = 'ptr-'
+
+if 'wnl' in ListNormalMethod:
+    wnl = nltk.WordNetLemmatizer()
+if 'porter' in ListNormalMethod:
+    myPorterStemmer = nltk.PorterStemmer()
+if 'lancaster' in ListNormalMethod:
+    myLancasterStemmer = nltk.LancasterStemmer()
+    
 for fileOne in filesInput:
     flagFirsRow = True
     PubmedFile= dirMain+fileOne
     
-    qq = unicode_csv_reader(open(PubmedFile, "rb"), dialect='excel')
+    iteObj = unicode_csv_reader(open(PubmedFile, "rb"), dialect='excel')
+#    print 'type(iteObj): ', type(iteObj)
+#    exit()
     
-    with open(PubmedFile[0:-4]+'.txt', 'w') as training:
-        for row in qq: # http://love-python.blogspot.com/2008/02/read-csv-file-in-python.html
+#    with open('wnl-'+PubmedFile[0:-4]+'.txt', 'w') as training:
+    with open(myType+PubmedFile[0:-4]+'.txt', 'w') as training:
+        for row in iteObj: # http://love-python.blogspot.com/2008/02/read-csv-file-in-python.html
         #    names.append((data[0], data[1]))
         #    print ', '.join(row)
-            myWriteData = ', '.join([row[2],row[4]])
+#            myTmpData = ' '.join([row[2].lower(),row[4].lower()])
+            myTmpData = ' '.join([row[2].lower(),row[4].lower()])
+            listTokens = nltk.wordpunct_tokenize(myTmpData)
+            
+            listTokensNotDigital = [w for w in listTokens if (not w.isalpha())]
+            listTokensStped = [w for w in listTokens if w.isalpha() and (w.lower() not in myStopwords)]
+
+
+#            if 'stpwRemoved' in ListNormalMethod:
+#                listContent = listTokensStped
+#            if 'wnl' in ListNormalMethod:
+            if myType == 'wnl-':
+                listContent = [wnl.lemmatize(t) for t in listTokensStped]
+            elif myType == 'ptr-':            
+#            if 'porter' in ListNormalMethod:
+                listContent = [myPorterStemmer.stem(t) for t in listTokensStped]
+            
+            myWriteData = ' '.join(listContent)
+            print 'myWriteData: ', myWriteData
 #            print row[2], row[4]
-            print myWriteData
+#            print listTokens
 #            training.write('%d\n' % numberAllyear)
             if not flagFirsRow:
+#                training.write(myTmpData+'\n')
                 training.write(myWriteData+'\n')
+                
             flagFirsRow = False
 
 #print names
