@@ -8,21 +8,27 @@ import csv
 myRe = '((^Title: |^Abstract: )(.*))'
 p = re.compile(myRe)
 
+#myType = 'wnl-'
+myType = 'ptr-'
+
 #filesInput = ['pure-doc-dx.txt', 'pure-doc-tx.txt']
 #filesInput = ['intervention.txt', 'patient.txt', 'outcome.txt']
-#filesInput = ['intervention.txt', 'patient.txt']
-#filesInput = ['intervention.txt', 'outcome.txt']
-filesInput = ['patient.txt', 'outcome.txt']
+
+#filesInput = [myType+'intervention.txt', myType+'patient.txt']
+#filesInput = [myType+'intervention.txt', myType+'outcome.txt']
+filesInput = [myType+'patient.txt', myType+'outcome.txt']
 
 
-documents = []
+listDoc = []
 listMyWords = []
 dirMain = ''
-outputPercentageFilenameBase = 'outputPer'
+outputPercentageFilenameBase = myType+'Percentage'
 
 
 for fileOne in filesInput:
-    outputFileNameDiff = fileOne[0:3]
+    outputFileNameDiff = fileOne[4:7]
+    print 'outputFileNameDiff: ', outputFileNameDiff
+#    exit()
     outputPercentageFilenameBase = outputPercentageFilenameBase + '-'+ outputFileNameDiff
     PubmedFile= dirMain+fileOne
     with open(PubmedFile) as fTxtOrg:
@@ -30,18 +36,23 @@ for fileOne in filesInput:
     print 'len(listDocOrg): ', len(listDocOrg)
 #    exit()
 #    with open(dirMain+'output'+fileOne[8:11]+'.csv', 'wb') as outf:
-    with open(dirMain+'output-'+outputFileNameDiff+'.csv', 'wb') as outf:
+#    with open(dirMain+myType+'output-'+outputFileNameDiff+'.csv', 'wb') as outf:
+    with open(dirMain+myType+outputFileNameDiff+'.csv', 'wb') as outf:
         for myString in listDocOrg:
-            print myString
+#            print myString
 #            myResult = p.search(myString)
 #            if myResult <> None:
 #                myData = re.sub('^Title: |^Abstract: ','',myResult.group())
 #                outf.write(myData)
             listMyWords.extend(myString.split())
-#                documents.append((myData.split(),fileOne[9:11]))
-            documents.append((myString.split(),outputFileNameDiff))
-random.shuffle(documents)
-#print len(documents), myData.split()
+#                listDoc.append((myData.split(),fileOne[9:11]))
+            listDoc.append((myString.split(),outputFileNameDiff))
+print 'type(listDoc): ', type(listDoc)
+print 'listDoc[0]: ', listDoc[0]
+print 'listDoc[1]: ', listDoc[1]
+
+random.shuffle(listDoc)
+#print len(listDoc), myData.split()
 print 'len(listMyWords): ', len(listMyWords)
 #exit()
 
@@ -65,9 +76,9 @@ favorDiagnostic = ['intervention', 'risk', 'therapy', 'disease', 'participants',
 print '\ndocument_features(favorDiagnostic): ', document_features(favorDiagnostic)
 
 
-featuresets = [(document_features(d), c) for (d,c) in documents]
-sizeTest = len(documents)/10
-print '\nlen(documents): ', len(documents), '\nsizeTraining:', len(documents)-sizeTest,'\nsizeTesting: ', sizeTest
+featuresets = [(document_features(d), c) for (d,c) in listDoc]
+sizeTest = len(listDoc)/10
+print '\nlen(listDoc): ', len(listDoc), '\nsizeTraining:', len(listDoc)-sizeTest,'\nsizeTesting: ', sizeTest
 
 train_set, test_set = featuresets[sizeTest:], featuresets[:sizeTest]
 classifier = nltk.NaiveBayesClassifier.train(train_set)
