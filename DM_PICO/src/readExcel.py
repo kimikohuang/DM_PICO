@@ -1,5 +1,7 @@
 import csv, codecs, cStringIO
 import nltk
+import os
+import shutil
 
 #portfolio = csv.reader(open('/home/kimiko/output.csv', "rb"))
 #portfolio = csv.reader(open('intervention.xls', "rb"), dialect='excel')
@@ -16,13 +18,18 @@ def utf_8_encoder(unicode_csv_data):
     for line in unicode_csv_data:
         yield line.encode('utf-8')
 
+dirCwd = os.getcwd()+'/'
+dirData = 'Data/'
+dirOutput = 'Output/'
 filesInput = ['intervention.csv', 'patient.csv', 'outcome.csv']
-dirMain = ''
 myStopwords = nltk.corpus.stopwords.words('english')
 ListNormalMethod = ['stpwRemoved', 'wnl', 'porter', 'lancaster']
 
+listMyType = ['stp-', 'wnl-', 'ptr-']
+
+myType = 'stp-'
 #myType = 'wnl-'
-myType = 'ptr-'
+#myType = 'ptr-'
 
 if 'wnl' in ListNormalMethod:
     wnl = nltk.WordNetLemmatizer()
@@ -31,21 +38,37 @@ if 'porter' in ListNormalMethod:
 if 'lancaster' in ListNormalMethod:
     myLancasterStemmer = nltk.LancasterStemmer()
     
+#for myType in listMyType:
+
+if os.path.isdir(dirCwd+dirOutput):
+    try:
+#            shutil.rmtree(LDASubDataDir, ignore_errors, onerror)
+        shutil.rmtree(dirCwd+dirOutput)
+    except:
+        raise
+os.mkdir(dirCwd+dirOutput)
+
 for fileOne in filesInput:
     flagFirsRow = True
-    PubmedFile= dirMain+fileOne
+    PubmedFile= dirCwd+dirData+fileOne
+    print 'PubmedFile: ', PubmedFile
+#    exit()
     
     iteObj = unicode_csv_reader(open(PubmedFile, "rb"), dialect='excel')
 #    print 'type(iteObj): ', type(iteObj)
 #    exit()
     
+    
+        
 #    with open('wnl-'+PubmedFile[0:-4]+'.txt', 'w') as training:
-    with open(myType+PubmedFile[0:-4]+'.txt', 'w') as training:
+    print "dirCwd+dirOutput+myType+fileOne[0:-4]+'.txt': ", dirCwd+dirOutput+myType+fileOne[0:-4]+'.txt'
+#    exit()
+    with open(dirCwd+dirOutput+myType+fileOne[0:-4]+'.txt', 'w') as training:
         for row in iteObj: # http://love-python.blogspot.com/2008/02/read-csv-file-in-python.html
         #    names.append((data[0], data[1]))
         #    print ', '.join(row)
 #            myTmpData = ' '.join([row[2].lower(),row[4].lower()])
-            myTmpData = ' '.join([row[2].lower(),row[4].lower()])
+            myTmpData = ' '.join([row[0].lower(),row[4].lower()])
             listTokens = nltk.wordpunct_tokenize(myTmpData)
             
             listTokensNotDigital = [w for w in listTokens if (not w.isalpha())]
@@ -55,7 +78,9 @@ for fileOne in filesInput:
 #            if 'stpwRemoved' in ListNormalMethod:
 #                listContent = listTokensStped
 #            if 'wnl' in ListNormalMethod:
-            if myType == 'wnl-':
+            if myType == 'stp-':
+                listContent = listTokensStped
+            elif myType == 'wnl-':
                 listContent = [wnl.lemmatize(t) for t in listTokensStped]
             elif myType == 'ptr-':            
 #            if 'porter' in ListNormalMethod:
