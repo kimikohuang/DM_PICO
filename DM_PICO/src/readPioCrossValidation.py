@@ -98,61 +98,61 @@ for uc in xpermutations.xuniqueCombinations(listFilesInput,2):
 print 'listFilesInputCombinations: ', listFilesInputCombinations
 #exit()
 
-for filesInput in listFilesInputCombinations:    
-    listDocOf2files = []
-    listMyWordsOf2files = []
+for filesnamePair in listFilesInputCombinations:    
+    listDoc2filesWithDiff = []
+    listWordsOf2files = []
     
     outputPercentageFilenameBase = typeTextPreprocess+'Percentage'
     
-    for fileOne in filesInput:
-        outputFileNameDiff = fileOne[0:3]
+    for oneFilename in filesnamePair:
+        outputFileNameDiff = oneFilename[0:3]
         print 'outputFileNameDiff: ', outputFileNameDiff
     #    exit()
         outputPercentageFilenameBase = outputPercentageFilenameBase + '-'+ outputFileNameDiff
-        filePioTxt= dirMain+dirInput+typeTextPreprocess+fileOne
+        filePioTxt= dirMain+dirInput+typeTextPreprocess+oneFilename
         with open(filePioTxt) as fTxtOrg:
-            listDocOrg = fTxtOrg.readlines()
-        print 'len(listDocOrg): ', len(listDocOrg)
+            listOneDoc = fTxtOrg.readlines()
+        print 'len(listOneDoc): ', len(listOneDoc)
     #    exit()
-    #    with open(dirMain+'output'+typeTextPreprocess+fileOne[8:11]+'.csv', 'wb') as outf:
+    #    with open(dirMain+'output'+typeTextPreprocess+oneFilename[8:11]+'.csv', 'wb') as outf:
     #    with open(dirMain+typeTextPreprocess+'output-'+outputFileNameDiff+'.csv', 'wb') as outf:
 
 
-        for rowOfListDocOrg in listDocOrg:
-            print 'rowOfListDocOrg: ', rowOfListDocOrg
-#            myResult = p.search(rowOfListDocOrg)
+        for rowOfListOneDoc in listOneDoc:
+            print 'rowOfListOneDoc: ', rowOfListOneDoc
+#            myResult = p.search(rowOfListOneDoc)
 #            if myResult <> None:
 #                myData = re.sub('^Title: |^Abstract: ','',myResult.group())
-            listMyWordsOf2files.extend(rowOfListDocOrg.split())
-#                listDocOf2files.append((myData.split(),fileOne[9:11]))
-            print '(rowOfListDocOrg.split(),outputFileNameDiff): ', (outputFileNameDiff, rowOfListDocOrg.split())
-            listDocOf2files.append((rowOfListDocOrg.split(),outputFileNameDiff))
-    print 'filesInput: ', filesInput, 'type(listDocOf2files): ', type(listDocOf2files)
-    print 'filesInput: ', filesInput, 'listDocOf2files[0]: ', listDocOf2files[0]
-    print 'filesInput: ', filesInput, 'listDocOf2files[1]: ', listDocOf2files[-1]
+            listWordsOf2files.extend(rowOfListOneDoc.split())
+#                listDoc2filesWithDiff.append((myData.split(),oneFilename[9:11]))
+            print '(rowOfListOneDoc.split(),outputFileNameDiff): ', (outputFileNameDiff, rowOfListOneDoc.split())
+            listDoc2filesWithDiff.append([rowOfListOneDoc.split(), outputFileNameDiff])
+    print 'filesnamePair: ', filesnamePair, 'type(listDoc2filesWithDiff): ', type(listDoc2filesWithDiff)
+    print 'filesnamePair: ', filesnamePair, 'listDoc2filesWithDiff[0]: ', listDoc2filesWithDiff[0]
+    print 'filesnamePair: ', filesnamePair, 'listDoc2filesWithDiff[1]: ', listDoc2filesWithDiff[-1]
     
 
 
     
     numFold = 5
-#    qq = k_fold_cross_validation(listDocOf2files, numFold, randomize = True)
-    for training, validation in k_fold_cross_validation(listDocOf2files, numFold, randomize = True):
-        for item in listDocOf2files:
-            assert (item in training) ^ (item in validation)
-        print '\ntraining: ', training, '\nvalidation: ', validation
+#    qq = k_fold_cross_validation(listDoc2filesWithDiff, numFold, randomize = True)
+    for listTrainWithDiff, listValidationWithDiff in k_fold_cross_validation(listDoc2filesWithDiff, numFold, randomize = True):
+        for item in listDoc2filesWithDiff:
+            assert (item in listTrainWithDiff) ^ (item in listValidationWithDiff)
+        print '\ntraining: ', listTrainWithDiff, '\nvalidation: ', listValidationWithDiff
 
 
 
-#    print type(qq), qq.training[0]
-    exit()
+#    print type(qq), qq.listTrainWithDiff[0]
+#    exit()
 
-    random.shuffle(listDocOf2files)
-    #print len(listDocOf2files), myData.split()
-    print 'len(listMyWordsOf2files): ', len(listMyWordsOf2files), 'listMyWordsOf2files: ', listMyWordsOf2files
+    random.shuffle(listDoc2filesWithDiff)
+    #print len(listDoc2filesWithDiff), myData.split()
+    print 'len(listWordsOf2files): ', len(listWordsOf2files), 'listWordsOf2files: ', listWordsOf2files
 #    exit()
     
     
-    all_words = nltk.FreqDist(listMyWordsOf2files)
+    all_words = nltk.FreqDist(listWordsOf2files)
     print 'len(all_words): ', len(all_words), type(all_words), 'all_words: ', all_words
     #print 'type(all_words): ', type(all_words), len(all_words)
     listWordFeatures = all_words.keys()[:len(all_words)/10]
@@ -165,10 +165,10 @@ for filesInput in listFilesInputCombinations:
     
 #    exit()
     
-    sizeTest = len(listDocOf2files)/10
-    print '\nlen(listDocOf2files): ', len(listDocOf2files), '\nsizeTraining:', len(listDocOf2files)-sizeTest,'\nsizeTesting: ', sizeTest
+    sizeTest = len(listDoc2filesWithDiff)/10
+    print '\nlen(listDoc2filesWithDiff): ', len(listDoc2filesWithDiff), '\nsizeTraining:', len(listDoc2filesWithDiff)-sizeTest,'\nsizeTesting: ', sizeTest
     
-    featuresets = [(document_features(myDoc), docType) for (myDoc,docType) in listDocOf2files]
+    featuresets = [(document_features(myDoc), docType) for (myDoc,docType) in listDoc2filesWithDiff]
     print 'featuresets: ', type(featuresets),  featuresets
     exit()
     
