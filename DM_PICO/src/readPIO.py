@@ -1,8 +1,19 @@
 #!/usr/bin/python
+'''
+Input:
+    'intervention.txt'
+    , 'patient.txt'
+    , 'outcome.txt'
+Output:
+    typeTextPreprocess+'Percentage' + '-'+ filesInput[4:7]
+'''
+import os
 import re
 import random
 import nltk
 import csv
+import shutil
+import xpermutations # http://code.activestate.com/recipes/190465-generator-for-permutations-combinations-selections/
 
 def document_features(document):
     document_words = set(document)
@@ -16,53 +27,110 @@ myRe = '((^Title: |^Abstract: )(.*))'
 p = re.compile(myRe)
 
 listMyType = ['stp-', 'wnl-', 'ptr-']
-myType = 'stp-'
-#myType = 'wnl-'
-#myType = 'ptr-'
+typeTextPreprocess = 'stp-'
+#typeTextPreprocess = 'wnl-'
+#typeTextPreprocess = 'ptr-'
 
 #filesInput = ['pure-doc-dx.txt', 'pure-doc-tx.txt']
 #filesInput = ['intervention.txt', 'patient.txt', 'outcome.txt']
-
-listFilesInput = [ [myType+'intervention.txt', myType+'patient.txt']
-                  ,[myType+'intervention.txt', myType+'outcome.txt']
-                  ,[myType+'patient.txt', myType+'outcome.txt']
-                  ]
-#filesInput = [myType+'intervention.txt', myType+'patient.txt']
-#filesInput = [myType+'intervention.txt', myType+'outcome.txt']
-#filesInput = [myType+'patient.txt', myType+'outcome.txt']
+listFilesInput = ['intervention.txt', 'patient.txt', 'outcome.txt']
+print "Unique Combinations of 2 letters from :",listFilesInput
+#for uc in xuniqueCombinations(['l','o','v','e'],2): print ''.join(uc)
 
 
-listDoc = []
-listMyWords = []
+
+#listFilesInputCombinations = [ [typeTextPreprocess+'intervention.txt', typeTextPreprocess+'patient.txt']
+#                  ,[typeTextPreprocess+'intervention.txt', typeTextPreprocess+'outcome.txt']
+#                  ,[typeTextPreprocess+'patient.txt', typeTextPreprocess+'outcome.txt']
+#                  ]
+#filesInput = [typeTextPreprocess+'intervention.txt', typeTextPreprocess+'patient.txt']
+#filesInput = [typeTextPreprocess+'intervention.txt', typeTextPreprocess+'outcome.txt']
+#filesInput = [typeTextPreprocess+'patient.txt', typeTextPreprocess+'outcome.txt']
+
+
 dirMain = ''
-outputPercentageFilenameBase = myType+'Percentage'
+dirInput = 'Output1/'
+dirOutput = 'Output2/'
 
-#for myType in listMyType:
+#for typeTextPreprocess in listMyType:
+dirCwd = os.getcwd()+'/'
+if os.path.isdir(dirCwd+dirOutput):
+    try:
+#            shutil.rmtree(LDASubDataDir, ignore_errors, onerror)
+        shutil.rmtree(dirCwd+dirOutput)
+    except:
+        raise
+os.mkdir(dirCwd+dirOutput)
 
-for filesInput in listFilesInput:    
-    
-    for fileOne in filesInput:
-        outputFileNameDiff = fileOne[4:7]
-        print 'outputFileNameDiff: ', outputFileNameDiff
-    #    exit()
-        outputPercentageFilenameBase = outputPercentageFilenameBase + '-'+ outputFileNameDiff
-        PubmedFile= dirMain+fileOne
-        with open(PubmedFile) as fTxtOrg:
+for fileOne in listFilesInput:
+    outputFileNameDiff = fileOne[0:3]
+    print 'outputFileNameDiff: ', outputFileNameDiff
+
+    listMyWords = []
+    listDoc = []
+
+    with open(dirMain+dirOutput+typeTextPreprocess+outputFileNameDiff+'.csv', 'wb') as outf:
+        filePioTxt= dirMain+dirInput+typeTextPreprocess+fileOne
+        with open(filePioTxt) as fTxtOrg:
             listDocOrg = fTxtOrg.readlines()
         print 'len(listDocOrg): ', len(listDocOrg)
-    #    exit()
-    #    with open(dirMain+'output'+fileOne[8:11]+'.csv', 'wb') as outf:
-    #    with open(dirMain+myType+'output-'+outputFileNameDiff+'.csv', 'wb') as outf:
-        with open(dirMain+myType+outputFileNameDiff+'.csv', 'wb') as outf:
-            for myString in listDocOrg:
-    #            print myString
-    #            myResult = p.search(myString)
+
+        for rowOfListDocOrg in listDocOrg:
+    #                print 'rowOfListDocOrg: ', rowOfListDocOrg
+    #            myResult = p.search(rowOfListDocOrg)
     #            if myResult <> None:
     #                myData = re.sub('^Title: |^Abstract: ','',myResult.group())
     #                outf.write(myData)
-                listMyWords.extend(myString.split())
+            outf.write(rowOfListDocOrg)
+            listMyWords.extend(rowOfListDocOrg.split())
     #                listDoc.append((myData.split(),fileOne[9:11]))
-                listDoc.append((myString.split(),outputFileNameDiff))
+            print '(rowOfListDocOrg.split(),outputFileNameDiff): ', (outputFileNameDiff, rowOfListDocOrg.split())
+            listDoc.append((rowOfListDocOrg.split(),outputFileNameDiff))
+
+#exit()
+
+listFilesInputCombinations = []
+for uc in xpermutations.xuniqueCombinations(listFilesInput,2):
+    listFilesInputCombinations.append(uc)
+#    print ' '.join(uc)
+print 'listFilesInputCombinations: ', listFilesInputCombinations
+#exit()
+
+for filesInput in listFilesInputCombinations:    
+    listDoc = []
+    listMyWords = []
+    
+    outputPercentageFilenameBase = typeTextPreprocess+'Percentage'
+    
+    for fileOne in filesInput:
+        outputFileNameDiff = fileOne[0:3]
+        print 'outputFileNameDiff: ', outputFileNameDiff
+    #    exit()
+        outputPercentageFilenameBase = outputPercentageFilenameBase + '-'+ outputFileNameDiff
+        filePioTxt= dirMain+dirInput+typeTextPreprocess+fileOne
+        with open(filePioTxt) as fTxtOrg:
+            listDocOrg = fTxtOrg.readlines()
+        print 'len(listDocOrg): ', len(listDocOrg)
+    #    exit()
+    #    with open(dirMain+'output'+typeTextPreprocess+fileOne[8:11]+'.csv', 'wb') as outf:
+    #    with open(dirMain+typeTextPreprocess+'output-'+outputFileNameDiff+'.csv', 'wb') as outf:
+
+
+        
+
+
+        with open(dirMain+dirOutput+typeTextPreprocess+outputFileNameDiff+'.csv', 'wb') as outf:
+            for rowOfListDocOrg in listDocOrg:
+#                print 'rowOfListDocOrg: ', rowOfListDocOrg
+    #            myResult = p.search(rowOfListDocOrg)
+    #            if myResult <> None:
+    #                myData = re.sub('^Title: |^Abstract: ','',myResult.group())
+    #                outf.write(myData)
+                outf.write(rowOfListDocOrg)
+                listMyWords.extend(rowOfListDocOrg.split())
+    #                listDoc.append((myData.split(),fileOne[9:11]))
+                print '(rowOfListDocOrg.split(),outputFileNameDiff): ', (outputFileNameDiff, rowOfListDocOrg.split())
+                listDoc.append((rowOfListDocOrg.split(),outputFileNameDiff))
     print 'type(listDoc): ', type(listDoc)
     print 'listDoc[0]: ', listDoc[0]
     print 'listDoc[1]: ', listDoc[1]
@@ -70,7 +138,7 @@ for filesInput in listFilesInput:
     random.shuffle(listDoc)
     #print len(listDoc), myData.split()
     print 'len(listMyWords): ', len(listMyWords)
-    #exit()
+#    exit()
     
     all_words = nltk.FreqDist(listMyWords)
     print 'len(all_words): ', len(all_words)
@@ -97,7 +165,7 @@ for filesInput in listFilesInput:
     cpdist = classifier._feature_probdist
     print 'classifier.most_informative_features(10):', classifier.most_informative_features(10)
     
-    with open(dirMain+outputPercentageFilenameBase+'.csv', 'wb') as outf:
+    with open(dirMain+dirOutput+outputPercentageFilenameBase+'.csv', 'wb') as outf:
         outcsv = csv.writer(outf)
         for fname, fval in classifier.most_informative_features(len(word_features)):
             def labelprob(l):
