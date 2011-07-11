@@ -134,86 +134,104 @@ for filesnamePair in listFilesInputCombinations:
 
 
     
-    numFold = 5
+    numFold = 3
+    idxCrossValidation = 0
 #    qq = k_fold_cross_validation(listDoc2filesWithDiff, numFold, randomize = True)
     for listTrainWithDiff, listValidationWithDiff in k_fold_cross_validation(listDoc2filesWithDiff, numFold, randomize = True):
+
         for item in listDoc2filesWithDiff:
             assert (item in listTrainWithDiff) ^ (item in listValidationWithDiff)
         print '\ntraining: ', listTrainWithDiff, '\nvalidation: ', listValidationWithDiff
+        
+        listAllDocWords = []
+        with open(dirMain+dirOutput+outputPercentageFilenameBase+'-Train-'+str(idxCrossValidation)+'.csv', 'wb') as outf2:
+            for oneRowOfListTrainWithDiff in listTrainWithDiff:
+                listAllDocWords.extend(oneRowOfListTrainWithDiff[0])
+                outf2.write(' '.join(oneRowOfListTrainWithDiff[0])+'\n')
+
+        with open(dirMain+dirOutput+outputPercentageFilenameBase+'-Test-'+str(idxCrossValidation)+'.csv', 'wb') as outf3:
+            for oneRowOflistValidationWithDiff in listValidationWithDiff:
+                print 'oneRowOflistValidationWithDiff: ', oneRowOflistValidationWithDiff
+                outf3.write(' '.join(oneRowOflistValidationWithDiff[0])+'\n')
+#                listAllDocWords.extend(oneRowOflistValidationWithDiff[0])
+#        exit()
 
 
 
-#    print type(qq), qq.listTrainWithDiff[0]
-#    exit()
+    #    print type(qq), qq.listTrainWithDiff[0]
+    #    exit()
+    
+    #    random.shuffle(listDoc2filesWithDiff)
+        #print len(listDoc2filesWithDiff), myData.split()
+#        print 'len(listAllDocWords): ', len(listAllDocWords), 'listAllDocWords: ', listAllDocWords
+#        exit()
+        
+        
+        all_words = nltk.FreqDist(listAllDocWords)
+        print 'len(all_words): ', len(all_words), type(all_words), 'all_words: ', all_words
+        #print 'type(all_words): ', type(all_words), len(all_words)
+        listWordFeatures = all_words.keys()[:len(all_words)/10]
+        print 'listWordFeatures: ', len(listWordFeatures), type(listWordFeatures), 'listWordFeatures: ', listWordFeatures
+    #    exit()
+        
+        favorDiagnostic = listWordFeatures
+    #    favorDiagnostic = ['intervention', 'risk', 'therapy', 'disease', 'participants', 'effects', 'subjects', 'patient', 'response', 'outcomes', 'events','outcome', 'findings', 'performance', 'statistically', 'evaluation', 'population']
+        print '\ndocument_features(favorDiagnostic): ', document_features(favorDiagnostic)
+        
+    #    exit()
+        
+#        sizeTest = len(listDoc2filesWithDiff)/10
+#        print '\nlen(listDoc2filesWithDiff): ', len(listDoc2filesWithDiff), '\nsizeTraining:', len(listDoc2filesWithDiff)-sizeTest,'\nsizeTesting: ', sizeTest
+        
+        featuresetsTrain = [(document_features(myDoc), docType) for (myDoc,docType) in listTrainWithDiff]
+        featuresetsTest = [(document_features(myDoc), docType) for (myDoc,docType) in listValidationWithDiff]
+        print 'featuresetsTrain: ', type(featuresetsTrain),  featuresetsTrain
+        exit()
+        
+#        train_set, test_set = featuresetsTrain[sizeTest:], featuresetsTrain[:sizeTest]
+        classifier = nltk.NaiveBayesClassifier.train(featuresetsTrain)
+        print 'nltk.classify.accuracy(classifier, test_set): ', nltk.classify.accuracy(classifier, featuresetsTest), '\n'
+        
+        
+        cpdist = classifier._feature_probdist
+        print 'classifier.most_informative_features(10):', classifier.most_informative_features(10)
 
-    random.shuffle(listDoc2filesWithDiff)
-    #print len(listDoc2filesWithDiff), myData.split()
-    print 'len(listWordsOf2files): ', len(listWordsOf2files), 'listWordsOf2files: ', listWordsOf2files
-#    exit()
-    
-    
-    all_words = nltk.FreqDist(listWordsOf2files)
-    print 'len(all_words): ', len(all_words), type(all_words), 'all_words: ', all_words
-    #print 'type(all_words): ', type(all_words), len(all_words)
-    listWordFeatures = all_words.keys()[:len(all_words)/10]
-    print 'listWordFeatures: ', len(listWordFeatures), type(listWordFeatures), 'listWordFeatures: ', listWordFeatures
-#    exit()
-    
-    favorDiagnostic = listWordFeatures
-#    favorDiagnostic = ['intervention', 'risk', 'therapy', 'disease', 'participants', 'effects', 'subjects', 'patient', 'response', 'outcomes', 'events','outcome', 'findings', 'performance', 'statistically', 'evaluation', 'population']
-    print '\ndocument_features(favorDiagnostic): ', document_features(favorDiagnostic)
-    
-#    exit()
-    
-    sizeTest = len(listDoc2filesWithDiff)/10
-    print '\nlen(listDoc2filesWithDiff): ', len(listDoc2filesWithDiff), '\nsizeTraining:', len(listDoc2filesWithDiff)-sizeTest,'\nsizeTesting: ', sizeTest
-    
-    featuresets = [(document_features(myDoc), docType) for (myDoc,docType) in listDoc2filesWithDiff]
-    print 'featuresets: ', type(featuresets),  featuresets
-    exit()
-    
-    train_set, test_set = featuresets[sizeTest:], featuresets[:sizeTest]
-    classifier = nltk.NaiveBayesClassifier.train(train_set)
-    print 'nltk.classify.accuracy(classifier, test_set): ', nltk.classify.accuracy(classifier, test_set), '\n'
-    
-    
-    cpdist = classifier._feature_probdist
-    print 'classifier.most_informative_features(10):', classifier.most_informative_features(10)
-    
-    with open(dirMain+dirOutput+outputPercentageFilenameBase+'.csv', 'wb') as outf:
-        outcsv = csv.writer(outf)
-        for fname, fval in classifier.most_informative_features(len(listWordFeatures)):
-            def labelprob(l):
-                return cpdist[l,fname].prob(fval)
+        
+        with open(dirMain+dirOutput+outputPercentageFilenameBase+idxCrossValidation+'.csv', 'wb') as outf:
+            idxCrossValidation = idxCrossValidation + 1
+            outcsv = csv.writer(outf)
+            for fname, fval in classifier.most_informative_features(len(listWordFeatures)):
+                def labelprob(l):
+                    return cpdist[l,fname].prob(fval)
+                
+                labels = sorted([l for l in classifier._labels if 
+                        fval in cpdist[l,fname].samples()], 
+                    key=labelprob)
+                if len(labels) == 1:
+                    continue
+                l0 = labels[0]
+                l1 = labels[-1]
+                if cpdist[l0,fname].prob(fval) == 0:
+                    ratio = 'INF'
+                else:
+                    ratio = '%8.1f' % (cpdist[l1,fname].prob(fval) / cpdist[l0,fname].prob(fval))
             
-            labels = sorted([l for l in classifier._labels if 
-                    fval in cpdist[l,fname].samples()], 
-                key=labelprob)
-            if len(labels) == 1:
-                continue
-            l0 = labels[0]
-            l1 = labels[-1]
-            if cpdist[l0,fname].prob(fval) == 0:
-                ratio = 'INF'
-            else:
-                ratio = '%8.1f' % (cpdist[l1,fname].prob(fval) / cpdist[l0,fname].prob(fval))
-        
-            if cpdist[l0,fname].prob(fval) == 0:
-                ratio1 = 'INF'
-            else:
-        #        ratio = '%8.1f' % (cpdist[l1,fname].prob(fval) / cpdist[l0,fname].prob(fval))
-                ratio1 = '%8.2f' % (cpdist[l1,fname].prob(fval) / (cpdist[l1,fname].prob(fval)+cpdist[l0,fname].prob(fval)))
-        
-            if cpdist[l0,fname].prob(fval) == 0:
-                ratio2 = 'INF'
-            else:
-                ratio2 = '%8.2f' % ( cpdist[l0,fname].prob(fval) / (cpdist[l1,fname].prob(fval) + cpdist[l0,fname].prob(fval)))
-        
-        #    print '%24s = %-14r %6s : %-6s = %s : 1.0' % (fname, fval, l1[:6], l0[:6], ratio)
-            print '%24s = %-14r %6s : %-6s = %s : 1.0 : %s : %s' % (fname, fval, l1[:6], l0[:6], ratio, ratio1, ratio2)
-    #        outf.write(fname, fval, l1[:6], l0[:6], ratio, ratio1, ratio2)
-    #        outf.write(fname, fval)
-            outcsv.writerow((fname, fval, l1[:6], l0[:6], ratio, '1', ratio1, ratio2))
+                if cpdist[l0,fname].prob(fval) == 0:
+                    ratio1 = 'INF'
+                else:
+            #        ratio = '%8.1f' % (cpdist[l1,fname].prob(fval) / cpdist[l0,fname].prob(fval))
+                    ratio1 = '%8.2f' % (cpdist[l1,fname].prob(fval) / (cpdist[l1,fname].prob(fval)+cpdist[l0,fname].prob(fval)))
+            
+                if cpdist[l0,fname].prob(fval) == 0:
+                    ratio2 = 'INF'
+                else:
+                    ratio2 = '%8.2f' % ( cpdist[l0,fname].prob(fval) / (cpdist[l1,fname].prob(fval) + cpdist[l0,fname].prob(fval)))
+            
+            #    print '%24s = %-14r %6s : %-6s = %s : 1.0' % (fname, fval, l1[:6], l0[:6], ratio)
+                print '%24s = %-14r %6s : %-6s = %s : 1.0 : %s : %s' % (fname, fval, l1[:6], l0[:6], ratio, ratio1, ratio2)
+        #        outf.write(fname, fval, l1[:6], l0[:6], ratio, ratio1, ratio2)
+        #        outf.write(fname, fval)
+                outcsv.writerow((fname, fval, l1[:6], l0[:6], ratio, '1', ratio1, ratio2))
 exit()
 #0.81
 classifier.show_most_informative_features(n=10)
