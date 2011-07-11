@@ -102,7 +102,7 @@ for filesnamePair in listFilesInputCombinations:
     listDoc2filesWithDiff = []
     listWordsOf2files = []
     
-    outputPercentageFilenameBase = typeTextPreprocess+'Percentage'
+    outputPercentageFilenameBase = typeTextPreprocess+'Per'
     
     for oneFilename in filesnamePair:
         outputFileNameDiff = oneFilename[0:3]
@@ -144,12 +144,12 @@ for filesnamePair in listFilesInputCombinations:
         print '\ntraining: ', listTrainWithDiff, '\nvalidation: ', listValidationWithDiff
         
         listAllDocWords = []
-        with open(dirMain+dirOutput+outputPercentageFilenameBase+'-Train-'+str(idxCrossValidation)+'.csv', 'wb') as outf2:
+        with open(dirMain+dirOutput+outputPercentageFilenameBase+str(idxCrossValidation)+'-Train-'+'.csv', 'wb') as outf2:
             for oneRowOfListTrainWithDiff in listTrainWithDiff:
                 listAllDocWords.extend(oneRowOfListTrainWithDiff[0])
                 outf2.write(' '.join(oneRowOfListTrainWithDiff[0])+'\n')
 
-        with open(dirMain+dirOutput+outputPercentageFilenameBase+'-Test-'+str(idxCrossValidation)+'.csv', 'wb') as outf3:
+        with open(dirMain+dirOutput+outputPercentageFilenameBase+str(idxCrossValidation)+'-Test-'+'.csv', 'wb') as outf3:
             for oneRowOflistValidationWithDiff in listValidationWithDiff:
                 print 'oneRowOflistValidationWithDiff: ', oneRowOflistValidationWithDiff
                 outf3.write(' '.join(oneRowOflistValidationWithDiff[0])+'\n')
@@ -186,7 +186,7 @@ for filesnamePair in listFilesInputCombinations:
         featuresetsTrain = [(document_features(myDoc), docType) for (myDoc,docType) in listTrainWithDiff]
         featuresetsTest = [(document_features(myDoc), docType) for (myDoc,docType) in listValidationWithDiff]
         print 'featuresetsTrain: ', type(featuresetsTrain),  featuresetsTrain
-        exit()
+#        exit()
         
 #        train_set, test_set = featuresetsTrain[sizeTest:], featuresetsTrain[:sizeTest]
         classifier = nltk.NaiveBayesClassifier.train(featuresetsTrain)
@@ -197,7 +197,7 @@ for filesnamePair in listFilesInputCombinations:
         print 'classifier.most_informative_features(10):', classifier.most_informative_features(10)
 
         
-        with open(dirMain+dirOutput+outputPercentageFilenameBase+idxCrossValidation+'.csv', 'wb') as outf:
+        with open(dirMain+dirOutput+outputPercentageFilenameBase+str(idxCrossValidation)+'.csv', 'wb') as outf:
             idxCrossValidation = idxCrossValidation + 1
             outcsv = csv.writer(outf)
             for fname, fval in classifier.most_informative_features(len(listWordFeatures)):
