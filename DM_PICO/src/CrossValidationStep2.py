@@ -17,7 +17,12 @@ import shutil
 import xpermutations # http://code.activestate.com/recipes/190465-generator-for-permutations-combinations-selections/
 from crossValidation import k_fold_cross_validation
 
-numFold = 3
+numFold = 10
+
+listMyType = ['stp-', 'wnl-', 'ptr-']
+#typeTextPreprocess = 'stp-'
+typeTextPreprocess = 'wnl-'
+#typeTextPreprocess = 'ptr-'
 
 def document_features(document, argListWordFeatures):
 #def document_features(document, listWordFeatures):
@@ -31,11 +36,6 @@ def document_features(document, argListWordFeatures):
 
 myRe = '((^Title: |^Abstract: )(.*))'
 p = re.compile(myRe)
-
-listMyType = ['stp-', 'wnl-', 'ptr-']
-typeTextPreprocess = 'stp-'
-#typeTextPreprocess = 'wnl-'
-#typeTextPreprocess = 'ptr-'
 
 #filesInput = ['pure-doc-dx.txt', 'pure-doc-tx.txt']
 #filesInput = ['intervention.txt', 'patient.txt', 'outcome.txt']
@@ -94,7 +94,8 @@ for fileOne in listFilesInput:
             listDoc.append((rowOfListDocOrg.split(),outputFileNameDiff))
     idxCrossValidation = 0
     for listTrainWithDiff, listValidationWithDiff in k_fold_cross_validation(listDoc, numFold, randomize = True):
-        outputPercentageFilenameBase = typeTextPreprocess+str(idxCrossValidation)+'-Per'
+#        outputPercentageFilenameBase = typeTextPreprocess+str(idxCrossValidation)+'-Per'
+        outputPercentageFilenameBase = typeTextPreprocess+str(idxCrossValidation)
 
         with open(dirMain+dirOutput+outputPercentageFilenameBase+'-'+outputFileNameDiff+'-Train-'+'.txt', 'wb') as outf2:
             for oneRowOfListTrainWithDiff in listTrainWithDiff:
@@ -121,13 +122,15 @@ for filesnamePair in listFilesInputCombinations:
     listDoc2filesWithDiff = []
     listWordsOf2files = []
     
-    outputPercentageFilenameBase = typeTextPreprocess+'Per'
+#    outputPercentageFilenameBase = typeTextPreprocess+'Per'
+#    outputPercentageFilenameBase = typeTextPreprocess+str(idxCrossValidation)+'-Per'
+
     
     for oneFilename in filesnamePair:
         outputFileNameDiff = oneFilename[0:3]
         print 'outputFileNameDiff: ', outputFileNameDiff
     #    exit()
-        outputPercentageFilenameBase = outputPercentageFilenameBase + '-'+ outputFileNameDiff
+#        outputPercentageFilenameBase = outputPercentageFilenameBase + '-'+ outputFileNameDiff
         filePioTxt= dirMain+dirInput+typeTextPreprocess+oneFilename
         with open(filePioTxt) as fTxtOrg:
             listOneDoc = fTxtOrg.readlines()
