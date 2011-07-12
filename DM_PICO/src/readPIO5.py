@@ -15,7 +15,15 @@ import csv
 import shutil
 import xpermutations # http://code.activestate.com/recipes/190465-generator-for-permutations-combinations-selections/
 
-numFold = 3
+numFold = 10
+
+listMyType = ['stp-', 'wnl-', 'ptr-']
+#typeTextPreprocess = ''
+#typeTextPreprocess = 'stp-'
+typeTextPreprocess = 'wnl-'
+#typeTextPreprocess = 'ptr-'
+
+
 
 def document_features(document):
     document_words = set(document)
@@ -27,12 +35,6 @@ def document_features(document):
 
 myRe = '((^Title: |^Abstract: )(.*))'
 p = re.compile(myRe)
-
-listMyType = ['stp-', 'wnl-', 'ptr-']
-#typeTextPreprocess = 'stp-'
-typeTextPreprocess = ''
-#typeTextPreprocess = 'wnl-'
-#typeTextPreprocess = 'ptr-'
 
 #filesInput = ['pure-doc-dx.txt', 'pure-doc-tx.txt']
 #filesInput = ['intervention.txt', 'patient.txt', 'outcome.txt']
@@ -65,39 +67,44 @@ if os.path.isdir(dirCwd+dirOutput):
 os.mkdir(dirCwd+dirOutput)
 
 
-for idxMyNum in range(0,numFold):
-    print idxMyNum
-    listFilesInput = ['stp-'+str(idxMyNum)+'-Per-int-Test-.txt', 'stp-'+str(idxMyNum)+'-Per-out-Test-.txt', 'stp-'+str(idxMyNum)+'-Per-pat-Test-.txt']
+for idxCrossValidation in range(0,numFold):
+    print idxCrossValidation
+    
+#    listFilesInput = ['stp-'+str(idxCrossValidation)+'-Per-int-Test-.txt', 'stp-'+str(idxCrossValidation)+'-Per-out-Test-.txt', 'stp-'+str(idxCrossValidation)+'-Per-pat-Test-.txt']
+    listFilesInput = [typeTextPreprocess+str(idxCrossValidation)+'-int-Test-.txt', typeTextPreprocess+str(idxCrossValidation)+'-out-Test-.txt', typeTextPreprocess+str(idxCrossValidation)+'-pat-Test-.txt']
 
 #exit()
     
 #    listFilesInput = ['stp-0-Per-int-Test-.txt', 'stp-0-Per-out-Test-.txt', 'stp-0-Per-pat-Test-.txt']
     print "Unique Combinations of 2 letters from :",listFilesInput
     for fileOne in listFilesInput:
-        outputFileNameDiff = fileOne[10:13]
+#        outputFileNameDiff = fileOne[10:13]
+        outputFileNameDiff = fileOne[6:9]
+        
         print 'outputFileNameDiff: ', outputFileNameDiff
     
         listMyWords = []
         listDoc = []
-    
-        with open(dirMain+dirOutput+typeTextPreprocess+outputFileNameDiff+str(idxMyNum)+'.csv', 'wb') as outf:
-            filePioTxt= dirCwd+dirInput+typeTextPreprocess+fileOne
-            with open(filePioTxt) as fTxtOrg:
-                listDocOrg = fTxtOrg.readlines()
-            print 'len(listDocOrg): ', len(listDocOrg)
-    
-            for rowOfListDocOrg in listDocOrg:
-        #                print 'rowOfListDocOrg: ', rowOfListDocOrg
-        #            myResult = p.search(rowOfListDocOrg)
-        #            if myResult <> None:
-        #                myData = re.sub('^Title: |^Abstract: ','',myResult.group())
-        #                outf.write(myData)
-                outf.write(rowOfListDocOrg)
-                listMyWords.extend(rowOfListDocOrg.split())
-        #                listDoc.append((myData.split(),fileOne[9:11]))
-                print '(rowOfListDocOrg.split(),outputFileNameDiff): ', (outputFileNameDiff, rowOfListDocOrg.split())
-                listDoc.append((rowOfListDocOrg.split(),outputFileNameDiff))
-    
+
+#         example from CrossValidationStep2
+#         outputPercentageFilenameBase = typeTextPreprocess+str(idxCrossValidation)+'-Per'
+
+#            filePioTxt= dirCwd+dirInput+typeTextPreprocess+fileOne
+        filePioTxt= dirCwd+dirInput+fileOne
+        with open(filePioTxt) as fTxtOrg:
+            listDocOrg = fTxtOrg.readlines()
+        print 'len(listDocOrg): ', len(listDocOrg)
+
+        for rowOfListDocOrg in listDocOrg:
+    #                print 'rowOfListDocOrg: ', rowOfListDocOrg
+    #            myResult = p.search(rowOfListDocOrg)
+    #            if myResult <> None:
+    #                myData = re.sub('^Title: |^Abstract: ','',myResult.group())
+            listMyWords.extend(rowOfListDocOrg.split())
+    #                listDoc.append((myData.split(),fileOne[9:11]))
+            print '(rowOfListDocOrg.split(),outputFileNameDiff): ', (outputFileNameDiff, rowOfListDocOrg.split())
+            listDoc.append((rowOfListDocOrg.split(),outputFileNameDiff))
+
     #exit()
     
     listFilesInputCombinations = []
@@ -111,17 +118,18 @@ for idxMyNum in range(0,numFold):
         listDoc = []
         listMyWords = []
         
-        outputPercentageFilenameBase = typeTextPreprocess+'Percentage'
+        outputPercentageFilenameBase = 'Per'
         
         for fileOne in filesInput:
-            outputFileNameDiff = fileOne[10:13]
+            outputFileNameDiff = fileOne[6:9]
             print 'outputFileNameDiff: ', outputFileNameDiff
             
     #        outputFileNameDiff = fileOne[0:3]
     #        print 'outputFileNameDiff: ', outputFileNameDiff
         #    exit()
             outputPercentageFilenameBase = outputPercentageFilenameBase + '-'+ outputFileNameDiff
-            filePioTxt= dirMain+dirInput+typeTextPreprocess+fileOne
+#            filePioTxt= dirMain+dirInput+typeTextPreprocess+fileOne
+            filePioTxt= dirMain+dirInput+fileOne
             with open(filePioTxt) as fTxtOrg:
                 listDocOrg = fTxtOrg.readlines()
             print 'len(listDocOrg): ', len(listDocOrg)
@@ -132,19 +140,15 @@ for idxMyNum in range(0,numFold):
     
             
     
-    
-            with open(dirMain+dirOutput+typeTextPreprocess+outputFileNameDiff+str(idxMyNum)+'.csv', 'wb') as outf:
-                for rowOfListDocOrg in listDocOrg:
-    #                print 'rowOfListDocOrg: ', rowOfListDocOrg
-        #            myResult = p.search(rowOfListDocOrg)
-        #            if myResult <> None:
-        #                myData = re.sub('^Title: |^Abstract: ','',myResult.group())
-        #                outf.write(myData)
-                    outf.write(rowOfListDocOrg)
-                    listMyWords.extend(rowOfListDocOrg.split())
-        #                listDoc.append((myData.split(),fileOne[9:11]))
-                    print '(rowOfListDocOrg.split(),outputFileNameDiff): ', (outputFileNameDiff, rowOfListDocOrg.split())
-                    listDoc.append((rowOfListDocOrg.split(),outputFileNameDiff))
+            for rowOfListDocOrg in listDocOrg:
+#                print 'rowOfListDocOrg: ', rowOfListDocOrg
+    #            myResult = p.search(rowOfListDocOrg)
+    #            if myResult <> None:
+    #                myData = re.sub('^Title: |^Abstract: ','',myResult.group())
+                listMyWords.extend(rowOfListDocOrg.split())
+    #                listDoc.append((myData.split(),fileOne[9:11]))
+                print '(rowOfListDocOrg.split(),outputFileNameDiff): ', (outputFileNameDiff, rowOfListDocOrg.split())
+                listDoc.append((rowOfListDocOrg.split(),outputFileNameDiff))
         print 'type(listDoc): ', type(listDoc)
         print 'listDoc[0]: ', listDoc[0]
         print 'listDoc[1]: ', listDoc[1]
@@ -179,7 +183,9 @@ for idxMyNum in range(0,numFold):
         cpdist = classifier._feature_probdist
         print 'classifier.most_informative_features(10):', classifier.most_informative_features(10)
         
-        with open(dirMain+dirOutput+outputPercentageFilenameBase+str(idxMyNum)+'.csv', 'wb') as outf:
+#        print dirMain+dirOutput+str(idxCrossValidation)+outputPercentageFilenameBase+'.csv'
+#        exit()
+        with open(dirMain+dirOutput+typeTextPreprocess+str(idxCrossValidation)+'-'+outputPercentageFilenameBase+'.csv', 'wb') as outf:
             outcsv = csv.writer(outf)
             for fname, fval in classifier.most_informative_features(len(word_features)):
                 def labelprob(l):
