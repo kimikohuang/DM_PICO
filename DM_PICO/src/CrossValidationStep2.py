@@ -17,6 +17,7 @@ import shutil
 import xpermutations # http://code.activestate.com/recipes/190465-generator-for-permutations-combinations-selections/
 from crossValidation import k_fold_cross_validation
 
+numFold = 3
 
 def document_features(document, argListWordFeatures):
 #def document_features(document, listWordFeatures):
@@ -66,7 +67,6 @@ if os.path.isdir(dirCwd+dirOutput):
     except:
         raise
 os.mkdir(dirCwd+dirOutput)
-numFold = 10
 
 for fileOne in listFilesInput:
     outputFileNameDiff = fileOne[0:3]

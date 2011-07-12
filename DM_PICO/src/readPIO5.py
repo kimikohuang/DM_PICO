@@ -15,6 +15,8 @@ import csv
 import shutil
 import xpermutations # http://code.activestate.com/recipes/190465-generator-for-permutations-combinations-selections/
 
+numFold = 3
+
 def document_features(document):
     document_words = set(document)
     features = {}
@@ -63,7 +65,7 @@ if os.path.isdir(dirCwd+dirOutput):
 os.mkdir(dirCwd+dirOutput)
 
 
-for idxMyNum in range(0,10):
+for idxMyNum in range(0,numFold):
     print idxMyNum
     listFilesInput = ['stp-'+str(idxMyNum)+'-Per-int-Test-.txt', 'stp-'+str(idxMyNum)+'-Per-out-Test-.txt', 'stp-'+str(idxMyNum)+'-Per-pat-Test-.txt']
 
@@ -166,7 +168,7 @@ for idxMyNum in range(0,10):
         
         
         featuresets = [(document_features(d), c) for (d,c) in listDoc]
-        sizeTest = len(listDoc)/10
+        sizeTest = len(listDoc)/numFold
         print '\nlen(listDoc): ', len(listDoc), '\nsizeTraining:', len(listDoc)-sizeTest,'\nsizeTesting: ', sizeTest
         
         train_set, test_set = featuresets[sizeTest:], featuresets[:sizeTest]
