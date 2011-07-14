@@ -29,9 +29,9 @@ def document_features(document, argListWordFeatures):
     return features
 
 
-def fCreadeCrossValidationFiles():
+def fCreadeCrossValidationFiles(numFold=10):
     
-    numFold = 10
+#    numFold = 10
     
     listMyType = ['stp-', 'wnl-', 'ptr-']
     #typeTextPreprocess = 'stp-'
