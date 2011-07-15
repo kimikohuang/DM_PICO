@@ -1,6 +1,6 @@
 #!/usr/bin/python
 '''
-pioNaiveBayes.py
+subprocess4Pico.py
 Input:
     'intervention.txt'
     , 'patient.txt'
