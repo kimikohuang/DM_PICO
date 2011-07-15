@@ -1,5 +1,6 @@
 #!/usr/bin/python
 '''
+pioNaiveBayes.py
 Input:
     'intervention.txt'
     , 'patient.txt'
@@ -15,6 +16,7 @@ import nltk
 import csv
 import shutil
 import xpermutations # http://code.activestate.com/recipes/190465-generator-for-permutations-combinations-selections/
+import sys
 
 def document_features(document, argWord_features):
     document_words = set(document)
@@ -26,8 +28,8 @@ def document_features(document, argWord_features):
 
 
 def fNaiveBayesTraining(numFold=10):
-    wordFeatureDivideNumStart10times = 1 # default = 3
-    wordFeatureDivideNumStop10times = 8 # default =10 not include
+    wordFeatureDivideNumStart10times = 4 # default = 3
+    wordFeatureDivideNumStop10times = 5 # default =10 not include
     wordFeatureDivideNumStep10times = 1 # default =10
     
 #    listMyType = ['stp-', 'wnl-', 'ptr-']
@@ -145,8 +147,8 @@ def fNaiveBayesTraining(numFold=10):
                     outputPercentageFilenameMiddle = outputPercentageFilenameMiddle + '-'+ outputFileNameDiff
         #            fileOneTrain= dirMain+dirInputTrainingSet+typeTextPreprocess+fileOne
 #                    fileOneTrain= dirMain+dirInputTrainingSet+fileOne+'-Train-.csv'
+
                     fileOneTrain= dirMain+dirInputTrainingSet+typeTextPreprocess+str(idxCrossValidation)+'-'+fileOne+'-Train-.csv'
-        
                     print 'fileOneTrain: ', fileOneTrain
 #                    exit()
                     with open(fileOneTrain) as fTxtOrgTrain:
@@ -180,8 +182,7 @@ def fNaiveBayesTraining(numFold=10):
                     for rowOfListDocOrgTest in listDocOrgTest:
                         listMyWordsTest.extend(rowOfListDocOrgTest.split())
                         listDocTest.append((rowOfListDocOrgTest.split(), outputFileNameDiff))
-
-
+                    
 
 
 #                print 'type(listDocTrain): ', type(listDocTrain)
@@ -209,9 +210,10 @@ def fNaiveBayesTraining(numFold=10):
                 
                 featuresetsTrain = [(document_features(d, word_features_Train), c) for (d,c) in listDocTrain]
                 featuresetsText = [(document_features(d, word_features_Train), c) for (d,c) in listDocTest]
-#                print 'sys.getsizeof(featuresetsTrain): ', sys.getsizeof(featuresetsTrain), 'ratioWordFeature: ', ratioWordFeature
-#                continue
+                print 'sys.getsizeof(featuresetsTrain): ', sys.getsizeof(featuresetsTrain), 'ratioWordFeature: ', ratioWordFeature
+                print 'sys.getsizeof(featuresetsText): ', sys.getsizeof(featuresetsText), 'ratioWordFeature: ', ratioWordFeature
 #                print '\nfeaturesets: ', len(featuresetsTrain), featuresetsTrain
+#                continue
                 # featuresetsTrain(1/3):  360 [({'bolus': False, 'magnetic': False, 'colonoscopy': False ... }, 'int')
                 # featuresetsTrain(1/2):  360 [({'bolus': False, 'ali': False, 'caused': False, 'magnetic': False ... }, 'int')
 #                exit()
