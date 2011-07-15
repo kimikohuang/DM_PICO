@@ -32,8 +32,8 @@ dirOutput_accuracy = 'Output3_accuracy/'
 
 dirCwd = os.getcwd()+'/'
 
-#listFilesInputFilenameStem = ['int', 'out', 'pat']
-listFilesInputFilenameStem = ['int', 'out']
+listFilesInputFilenameStem = ['int', 'out', 'pat']
+#listFilesInputFilenameStem = ['int', 'out']
 
 #    listMyType = ['stp-', 'wnl-', 'ptr-']
 #typeTextPreprocess = ''
@@ -45,6 +45,7 @@ global_list_Word_features = []
 ratioWordFeature = 0.0
 dirOutput = ''
 listDocTrain = []
+listFilesInputPair = []
 
 
 
@@ -93,97 +94,89 @@ def fSubprocess(idxCrossValidation):
 #    listFilesInputTrain = ['stp-0-Per-int-Test-.txt', 'stp-0-Per-out-Test-.txt', 'stp-0-Per-pat-Test-.txt']
 #            print "Unique Combinations of 2 letters from :",listFilesInputTrain
     
-    listFilesInputCombinations = []
-#            for uc in xpermutations.xuniqueCombinations(listFilesInputTrain, 2):
-    for uc in xpermutations.xuniqueCombinations(listFilesInputFilenameStem, 2):
-        listFilesInputCombinations.append(uc)
-#                print type(uc), ' '.join(uc)
-#            exit()
+    listDocTrain = []
+    listDocTest = []
     
-    for listFilesInputPair in listFilesInputCombinations:    
-        listDocTrain = []
-        listDocTest = []
-        
-        listMyWordsTrain = []
-        listMyWordsTest = []
+    listMyWordsTrain = []
+    listMyWordsTest = []
 
-        outputPercentageFilenameMiddle = 'Per'
-        
-        for fileOne in listFilesInputPair:
-            outputFileNameDiff = fileOne[0:3]
-            print 'fileOne: ', fileOne, 'outputFileNameDiff: ', outputFileNameDiff
+    outputPercentageFilenameMiddle = 'Per'
+    
+    for fileOne in listFilesInputPair:
+        outputFileNameDiff = fileOne[0:3]
+        print 'fileOne: ', fileOne, 'outputFileNameDiff: ', outputFileNameDiff
 #                    exit()
-            
-    #        outputFileNameDiff = fileOne[0:3]
-    #        print 'outputFileNameDiff: ', outputFileNameDiff
-        #    exit()
-            outputPercentageFilenameMiddle = outputPercentageFilenameMiddle + '-'+ outputFileNameDiff
+        
+#        outputFileNameDiff = fileOne[0:3]
+#        print 'outputFileNameDiff: ', outputFileNameDiff
+    #    exit()
+        outputPercentageFilenameMiddle = outputPercentageFilenameMiddle + '-'+ outputFileNameDiff
 #            fileOneTrain= dirMain+dirInputTrainingSet+typeTextPreprocess+fileOne
 #                    fileOneTrain= dirMain+dirInputTrainingSet+fileOne+'-Train-.csv'
 
-            fileOneTrain= dirMain+dirInputTrainingSet+typeTextPreprocess+str(idxCrossValidation)+'-'+fileOne+'-Train-.csv'
-            print 'fileOneTrain: ', fileOneTrain
+        fileOneTrain= dirMain+dirInputTrainingSet+typeTextPreprocess+str(idxCrossValidation)+'-'+fileOne+'-Train-.csv'
+        print 'fileOneTrain: ', fileOneTrain
 #                    exit()
-            with open(fileOneTrain) as fTxtOrgTrain:
-                listDocOrgTrain = fTxtOrgTrain.readlines()
+        with open(fileOneTrain) as fTxtOrgTrain:
+            listDocOrgTrain = fTxtOrgTrain.readlines()
 #                    print 'len(listDocOrgTrain): ', len(listDocOrgTrain), listDocOrgTrain
-            
-            fileOneTest= dirMain+dirInputTestingSet+typeTextPreprocess+str(idxCrossValidation)+'-'+fileOne+'-Test-.csv'
-            print 'fileOneTest: ', fileOneTest
-            with open(fileOneTest) as fTxtOrgTest:
-                listDocOrgTest = fTxtOrgTest.readlines()
+        
+        fileOneTest= dirMain+dirInputTestingSet+typeTextPreprocess+str(idxCrossValidation)+'-'+fileOne+'-Test-.csv'
+        print 'fileOneTest: ', fileOneTest
+        with open(fileOneTest) as fTxtOrgTest:
+            listDocOrgTest = fTxtOrgTest.readlines()
 #                    print 'len(listDocOrgText): ', len(listDocOrgTrain), listDocOrgTrain
-            
-        #    exit()
-        #    with open(dirMain+'output'+typeTextPreprocess+fileOne[8:11]+'.csv', 'wb') as outf:
-        #    with open(dirMain+typeTextPreprocess+'output-'+outputFileNameDiff+'.csv', 'wb') as outf:
-    
-    
-            
-    
-            for rowOfListDocOrgTrain in listDocOrgTrain:
+        
+    #    exit()
+    #    with open(dirMain+'output'+typeTextPreprocess+fileOne[8:11]+'.csv', 'wb') as outf:
+    #    with open(dirMain+typeTextPreprocess+'output-'+outputFileNameDiff+'.csv', 'wb') as outf:
+
+
+        
+
+        for rowOfListDocOrgTrain in listDocOrgTrain:
 #                print 'rowOfListDocOrgTrain: ', rowOfListDocOrgTrain
-    #            myResult = p.search(rowOfListDocOrgTrain)
-    #            if myResult <> None:
-    #                myData = re.sub('^Title: |^Abstract: ','',myResult.group())
-                listMyWordsTrain.extend(rowOfListDocOrgTrain.split())
-    #                listDocTrain.append((myData.split(),fileOne[9:11]))
+#            myResult = p.search(rowOfListDocOrgTrain)
+#            if myResult <> None:
+#                myData = re.sub('^Title: |^Abstract: ','',myResult.group())
+            listMyWordsTrain.extend(rowOfListDocOrgTrain.split())
+#                listDocTrain.append((myData.split(),fileOne[9:11]))
 #                        print '(rowOfListDocOrgTrain.split(),outputFileNameDiff): ', (outputFileNameDiff, rowOfListDocOrgTrain.split())
-                listDocTrain.append((rowOfListDocOrgTrain.split(), outputFileNameDiff))
+            listDocTrain.append((rowOfListDocOrgTrain.split(), outputFileNameDiff))
 #               (for fileOne in listFilesInputPair:) END
 
-            for rowOfListDocOrgTest in listDocOrgTest:
-                listMyWordsTest.extend(rowOfListDocOrgTest.split())
-                listDocTest.append((rowOfListDocOrgTest.split(), outputFileNameDiff))
-            
+        for rowOfListDocOrgTest in listDocOrgTest:
+            listMyWordsTest.extend(rowOfListDocOrgTest.split())
+            listDocTest.append((rowOfListDocOrgTest.split(), outputFileNameDiff))
+        
 
 
-        print 'type(listDocTrain): ', type(listDocTrain), 'len(listDocTrain): ', len(listDocTrain)
-        print 'listDocTrain[0]: ', listDocTrain[0]
-        print 'listDocTrain[1]: ', listDocTrain[-1]
+    print 'type(listDocTrain): ', type(listDocTrain), 'len(listDocTrain): ', len(listDocTrain)
+    print 'listDocTrain[0]: ', listDocTrain[0]
+    print 'listDocTrain[1]: ', listDocTrain[-1]
 #        random.shuffle(listDocTrain)
 #        print 'len(listMyWordsTrain): ', len(listMyWordsTrain)
 #exit()
-        
-        allWordsTrain = nltk.FreqDist(listMyWordsTrain)
+    
+    allWordsTrain = nltk.FreqDist(listMyWordsTrain)
 #                allWordsTest = nltk.FreqDist(listMyWordsTest)
-        print 'type(allWordsTrain): ', type(allWordsTrain), len(allWordsTrain)
+    print 'type(allWordsTrain): ', type(allWordsTrain), len(allWordsTrain)
 #        global_list_Word_features = allWordsTrain.keys()[:len(allWordsTrain)/10]
-        global_list_Word_features = allWordsTrain.keys()[:int(len(allWordsTrain)*ratioWordFeature)]
+    global_list_Word_features = allWordsTrain.keys()[:int(len(allWordsTrain)*ratioWordFeature)]
 #                word_features_Test = allWordsTrain.keys()[:len(allWordsTest)]
-        print 'ratioWordFeature: ', ratioWordFeature, 'global_list_Word_features: ', len(global_list_Word_features), type(global_list_Word_features), global_list_Word_features
-        # global_list_Word_features:  1985 <type 'list'> ['patient', 'group', 'rate', 'day', 'n', 'treatment', 'using', 'outcome', 'week', 'clinical',
+    print 'ratioWordFeature: ', ratioWordFeature, 'global_list_Word_features: ', len(global_list_Word_features), type(global_list_Word_features), global_list_Word_features
+    # global_list_Word_features:  1985 <type 'list'> ['patient', 'group', 'rate', 'day', 'n', 'treatment', 'using', 'outcome', 'week', 'clinical',
 #                exit()
-        
-        
-        
-    #    favorDiagnostic = ['intervention', 'risk', 'therapy', 'disease', 'participants', 'effects', 'subjects', 'patient', 'response', 'outcomes', 'events','outcome', 'findings', 'performance', 'statistically', 'evaluation', 'population']
-        
-        featuresetsTrain = [(document_features(d), c) for (d,c) in listDocTrain]
-        featuresetsText = [(document_features(d), c) for (d,c) in listDocTest]
+    
+    
+    
+#    favorDiagnostic = ['intervention', 'risk', 'therapy', 'disease', 'participants', 'effects', 'subjects', 'patient', 'response', 'outcomes', 'events','outcome', 'findings', 'performance', 'statistically', 'evaluation', 'population']
+    
+    featuresetsTrain = [(document_features(d), c) for (d,c) in listDocTrain]
+    featuresetsText = [(document_features(d), c) for (d,c) in listDocTest]
 #        print document_features_index(d, global_list_Word_features)
-    #    print '\ndocument_features(favorDiagnostic): ', document_features(favorDiagnostic)
-        
+#    print '\ndocument_features(favorDiagnostic): ', document_features(favorDiagnostic)
+    
 #        featuresetsTrain = [(document_features_index(d), c) for (d,c) in listDocTrain]
 #        print 'sys.getsizeof(featuresetsTrain): ', sys.getsizeof(featuresetsTrain), 'ratioWordFeature: ', ratioWordFeature
 #        print '\nfeaturesets: ', len(featuresetsTrain), featuresetsTrain[0]
@@ -194,67 +187,67 @@ def fSubprocess(idxCrossValidation):
 #        print 'sys.getsizeof(featuresetsText): ', sys.getsizeof(featuresetsText), 'ratioWordFeature: ', ratioWordFeature
 
 #        continue
-        # featuresetsTrain(1/3):  360 [({'bolus': False, 'magnetic': False, 'colonoscopy': False ... }, 'int')
-        # featuresetsTrain(1/2):  360 [({'bolus': False, 'ali': False, 'caused': False, 'magnetic': False ... }, 'int')
+    # featuresetsTrain(1/3):  360 [({'bolus': False, 'magnetic': False, 'colonoscopy': False ... }, 'int')
+    # featuresetsTrain(1/2):  360 [({'bolus': False, 'ali': False, 'caused': False, 'magnetic': False ... }, 'int')
 #                exit()
 #                sizeTest = len(listDocTrain)/numFold
 #                print '\nlen(listDocTrain): ', len(listDocTrain), '\nsizeTraining:', len(listDocTrain)-sizeTest,'\nsizeTesting: ', sizeTest
-        
+    
 #                train_set, test_set = featuresetsTrain[sizeTest:], featuresetsTrain[:sizeTest]
 #                classifier = nltk.NaiveBayesClassifier.train(train_set)
-        classifier = nltk.NaiveBayesClassifier.train(featuresetsTrain)
+    classifier = nltk.NaiveBayesClassifier.train(featuresetsTrain)
 
 #                with open(dirMain+dirOutputMergeFile+typeTextPreprocess+'-'+str(idxCrossValidation)+'-Train-'+'.csv', 'a') as outfFullTrain:
-        with open(dirMain+dirOutput_accuracy+typeTextPreprocess+'-accuracy.csv', 'a') as outfAccuracy:
+    with open(dirMain+dirOutput_accuracy+typeTextPreprocess+'-accuracy.csv', 'a') as outfAccuracy:
 #                    myAccruacyData = 'ratioWordFeature,' + str(ratioWordFeature) +','+ '-'.join(listFilesInputPair) + ',idxCrossValidation,' + str(idxCrossValidation)+',accuracy,' + str(nltk.classify.accuracy(classifier, featuresetsText)) +'\n'
-            myAccruacyData = str(ratioWordFeature) +','+ '-'.join(listFilesInputPair) +','+ str(idxCrossValidation) +','+ str(nltk.classify.accuracy(classifier, featuresetsText)) +'\n'
-            print 'myAccruacyData: ', myAccruacyData
-            outfAccuracy.write(myAccruacyData)
+        myAccruacyData = str(ratioWordFeature) +','+ '-'.join(listFilesInputPair) +','+ str(idxCrossValidation) +','+ str(nltk.classify.accuracy(classifier, featuresetsText)) +'\n'
+        print 'myAccruacyData: ', myAccruacyData
+        outfAccuracy.write(myAccruacyData)
 #                    exit()
 #                    outfAccuracy.write(myAccruacyData)
 #                    outfAccuracy.write()
-            print myAccruacyData
-        
-        
-        cpdist = classifier._feature_probdist
+        print myAccruacyData
+    
+    
+    cpdist = classifier._feature_probdist
 #                print 'classifier.most_informative_features(10):', classifier.most_informative_features(10)
-        
+    
 #        print dirMain+dirOutput+str(idxCrossValidation)+outputPercentageFilenameMiddle+'.csv'
 #        exit()
-        with open(dirMain+dirOutput+typeTextPreprocess+str(idxCrossValidation)+'-'+outputPercentageFilenameMiddle+'.csv', 'wb') as outf:
-            outcsv = csv.writer(outf)
-            for fname, fval in classifier.most_informative_features(len(global_list_Word_features)):
-                def labelprob(l):
-                    return cpdist[l,fname].prob(fval)
-                
-                labels = sorted([l for l in classifier._labels if 
-                        fval in cpdist[l,fname].samples()], 
-                    key=labelprob)
-                if len(labels) == 1:
-                    continue
-                l0 = labels[0]
-                l1 = labels[-1]
-                if cpdist[l0,fname].prob(fval) == 0:
-                    ratio = 'INF'
-                else:
-                    ratio = '%8.1f' % (cpdist[l1,fname].prob(fval) / cpdist[l0,fname].prob(fval))
+    with open(dirMain+dirOutput+typeTextPreprocess+str(idxCrossValidation)+'-'+outputPercentageFilenameMiddle+'.csv', 'wb') as outf:
+        outcsv = csv.writer(outf)
+        for fname, fval in classifier.most_informative_features(len(global_list_Word_features)):
+            def labelprob(l):
+                return cpdist[l,fname].prob(fval)
             
-                if cpdist[l0,fname].prob(fval) == 0:
-                    ratio1 = 'INF'
-                else:
-            #        ratio = '%8.1f' % (cpdist[l1,fname].prob(fval) / cpdist[l0,fname].prob(fval))
-                    ratio1 = '%8.2f' % (cpdist[l1,fname].prob(fval) / (cpdist[l1,fname].prob(fval)+cpdist[l0,fname].prob(fval)))
-            
-                if cpdist[l0,fname].prob(fval) == 0:
-                    ratio2 = 'INF'
-                else:
-                    ratio2 = '%8.2f' % ( cpdist[l0,fname].prob(fval) / (cpdist[l1,fname].prob(fval) + cpdist[l0,fname].prob(fval)))
-            
-            #    print '%24s = %-14r %6s : %-6s = %s : 1.0' % (fname, fval, l1[:6], l0[:6], ratio)
+            labels = sorted([l for l in classifier._labels if 
+                    fval in cpdist[l,fname].samples()], 
+                key=labelprob)
+            if len(labels) == 1:
+                continue
+            l0 = labels[0]
+            l1 = labels[-1]
+            if cpdist[l0,fname].prob(fval) == 0:
+                ratio = 'INF'
+            else:
+                ratio = '%8.1f' % (cpdist[l1,fname].prob(fval) / cpdist[l0,fname].prob(fval))
+        
+            if cpdist[l0,fname].prob(fval) == 0:
+                ratio1 = 'INF'
+            else:
+        #        ratio = '%8.1f' % (cpdist[l1,fname].prob(fval) / cpdist[l0,fname].prob(fval))
+                ratio1 = '%8.2f' % (cpdist[l1,fname].prob(fval) / (cpdist[l1,fname].prob(fval)+cpdist[l0,fname].prob(fval)))
+        
+            if cpdist[l0,fname].prob(fval) == 0:
+                ratio2 = 'INF'
+            else:
+                ratio2 = '%8.2f' % ( cpdist[l0,fname].prob(fval) / (cpdist[l1,fname].prob(fval) + cpdist[l0,fname].prob(fval)))
+        
+        #    print '%24s = %-14r %6s : %-6s = %s : 1.0' % (fname, fval, l1[:6], l0[:6], ratio)
 #                        print '%24s = %-14r %6s : %-6s = %s : 1.0 : %s : %s' % (fname, fval, l1[:6], l0[:6], ratio, ratio1, ratio2)
-        #        outf.write(fname, fval, l1[:6], l0[:6], ratio, ratio1, ratio2)
-        #        outf.write(fname, fval)
-                outcsv.writerow((fname, fval, l1[:6], l0[:6], ratio, '1', ratio1, ratio2))
+    #        outf.write(fname, fval, l1[:6], l0[:6], ratio, ratio1, ratio2)
+    #        outf.write(fname, fval)
+            outcsv.writerow((fname, fval, l1[:6], l0[:6], ratio, '1', ratio1, ratio2))
 #                print 'listFilesInputCombinations: ', listFilesInputCombinations
 
 
@@ -265,6 +258,7 @@ def fNaiveBayesTraining(numFold=10):
     global global_list_Word_features
     global ratioWordFeature
     global dirOutput
+    global listFilesInputPair
     
     
     
@@ -325,13 +319,23 @@ def fNaiveBayesTraining(numFold=10):
 
 # ================================================================================================================
         for idxCrossValidation in range(0,numFold):
-            p = Process(target=fSubprocess, args=(idxCrossValidation,))
-            p.start()
-            #dicCorpus = parent_conn.recv()
-            #print parent_conn.recv()   # prints "[42, None, 'hello']"
-            p.join()
-        #    exit()
-    #        logging.debug('PubmedFileTA: '+fileNamePubmedTA+' OK!')
+          
+            listFilesInputCombinations = []
+        #            for uc in xpermutations.xuniqueCombinations(listFilesInputTrain, 2):
+            for uc in xpermutations.xuniqueCombinations(listFilesInputFilenameStem, 2):
+                listFilesInputCombinations.append(uc)
+        #                print type(uc), ' '.join(uc)
+        #            exit()
+            
+            for listFilesInputPair in listFilesInputCombinations:    
+            
+                p = Process(target=fSubprocess, args=(idxCrossValidation,))
+                p.start()
+                #dicCorpus = parent_conn.recv()
+                #print parent_conn.recv()   # prints "[42, None, 'hello']"
+                p.join()
+            #    exit()
+        #        logging.debug('PubmedFileTA: '+fileNamePubmedTA+' OK!')
 
 if __name__ == "__main__":
     fNaiveBayesTraining(5)
