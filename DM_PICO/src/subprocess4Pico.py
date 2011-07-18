@@ -20,8 +20,8 @@ import sys
 from multiprocessing import Process
 
 
-wordFeatureRatioStart10times = 4 # default = 3
-wordFeatureRatioStop10times = 5 # default =10 not include
+wordFeatureRatioStart10times = 1 # default = 3
+wordFeatureRatioStop10times = 40 # default =10 not include
 wordFeatureRatioStep10times = 1 # default =10
 
 dirMain = ''
@@ -302,7 +302,7 @@ def fNaiveBayesTraining(numFold=10):
 #    wordFeatureRatio10times = 0.1
     for wordFeatureRatio10times in range(wordFeatureRatioStart10times,wordFeatureRatioStop10times, wordFeatureRatioStep10times):
 #        print 'wordFeatureRatio10times: ', wordFeatureRatio10times
-        ratioWordFeature = wordFeatureRatio10times/10.0
+        ratioWordFeature = wordFeatureRatio10times/100.0
         print 'ratioWordFeature: ', ratioWordFeature
 #        continue
         
