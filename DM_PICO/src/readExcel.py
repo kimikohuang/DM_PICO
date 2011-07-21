@@ -5,9 +5,9 @@ Input:
     , 'patient.csv'
     , 'outcome.csv'
 Output:
-    /Output1/stp-intervention.txt
-    /Output1/stp-patient.txt
-    /Output1/stp-outcome.txt
+    /Output1/(stp|wnl)-intervention.txt
+    /Output1/(stp|wnl)-patient.txt
+    /Output1/(stp|wnl)-outcome.txt
 '''
 
 import csv, codecs, cStringIO

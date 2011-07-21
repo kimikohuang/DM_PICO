@@ -17,14 +17,15 @@ import shutil
 import xpermutations # http://code.activestate.com/recipes/190465-generator-for-permutations-combinations-selections/
 import sys
 from multiprocessing import Process
-
+#import nltkPrecisionRecallFMeasure2
+import collections
 
 flagComplements = True
 #flagComplements = False
 
-wordFeatureRatioStart10times = 40 # default = 3
-wordFeatureRatioStop10times = 50 # default =10 not include
-wordFeatureRatioStep10times = 10 # default =10
+wordFeatureRatioStart10times = 1 # default = 3
+wordFeatureRatioStop10times = 27 # default =10 not include
+wordFeatureRatioStep10times = 5 # default =10
 
 
 dirMain = ''
@@ -115,19 +116,19 @@ def fSubprocess(idxCrossValidation):
 #        labelNaiveBayes = outputFileNameDiff
         if len(listFilePair0) == 1:
             labelNaiveBayes = listFilePair0[0][0:3]
+            labelPos = labelNaiveBayes
         else:
             labelNaiveBayes = 'N'+outputFileNameDiff[0:2]
+            labelNeg = labelNaiveBayes
 
         outputPercentageFilenameMiddle = outputPercentageFilenameMiddle + '-'+ labelNaiveBayes
 
         for fileOne in listFilePair0:
                 
 #            fileOne = listFilePair0[0]
-            print 'fileOne: ', fileOne
-#            exit()
 #            outputFileNameDiff = outputFileNameDiff+fileOne[0:3]
 #            outputFileNameDiff = fileOne[0:3]
-            print 'fileOne: ', fileOne, 'outputFileNameDiff: ', outputFileNameDiff
+#            print 'fileOne: ', fileOne, 'outputFileNameDiff: ', outputFileNameDiff
     #        exit()
     
     #        outputFileNameDiff = fileOne[0:3]
@@ -138,21 +139,16 @@ def fSubprocess(idxCrossValidation):
     #                    fileOneTrain= dirMain+dirInputTrainingSet+fileOne+'-Train-.csv'
     
             fileOneTrain= dirMain+dirInputTrainingSet+typeTextPreprocess+str(idxCrossValidation)+'-'+fileOne+'-Train-.csv'
-            print 'fileOneTrain: ', fileOneTrain
-    #                    exit()
             with open(fileOneTrain) as fTxtOrgTrain:
                 listDocOrgTrain = fTxtOrgTrain.readlines()
     #                    print 'len(listDocOrgTrain): ', len(listDocOrgTrain), listDocOrgTrain
-            
+
             fileOneTest= dirMain+dirInputTestingSet+typeTextPreprocess+str(idxCrossValidation)+'-'+fileOne+'-Test-.csv'
-            print 'fileOneTest: ', fileOneTest
             with open(fileOneTest) as fTxtOrgTest:
                 listDocOrgTest = fTxtOrgTest.readlines()
     #                    print 'len(listDocOrgText): ', len(listDocOrgTrain), listDocOrgTrain
             
-        #    exit()
-        #    with open(dirMain+'output'+typeTextPreprocess+fileOne[8:11]+'.csv', 'wb') as outf:
-        #    with open(dirMain+typeTextPreprocess+'output-'+outputFileNameDiff+'.csv', 'wb') as outf:
+#            print 'fileOneTrain: ', fileOneTrain, 'fileOneTest: ', fileOneTest
             
     
             for rowOfListDocOrgTrain in listDocOrgTrain:
@@ -173,9 +169,9 @@ def fSubprocess(idxCrossValidation):
                 listDocTest.append((rowOfListDocOrgTest.split(), labelNaiveBayes))
 
 
-    print 'type(global_listDocTrain): ', type(global_listDocTrain), 'len(global_listDocTrain): ', len(global_listDocTrain)
-    print 'global_listDocTrain[0]: ', global_listDocTrain[0]
-    print 'global_listDocTrain[1]: ', global_listDocTrain[-1]
+#    print 'type(global_listDocTrain): ', type(global_listDocTrain), 'len(global_listDocTrain): ', len(global_listDocTrain)
+#    print 'global_listDocTrain[0]: ', global_listDocTrain[0]
+#    print 'global_listDocTrain[1]: ', global_listDocTrain[-1]
 #        random.shuffle(global_listDocTrain)
 #        print 'len(listMyWordsTrain): ', len(listMyWordsTrain)
 #exit()
@@ -194,7 +190,7 @@ def fSubprocess(idxCrossValidation):
 #    favorDiagnostic = ['intervention', 'risk', 'therapy', 'disease', 'participants', 'effects', 'subjects', 'patient', 'response', 'outcomes', 'events','outcome', 'findings', 'performance', 'statistically', 'evaluation', 'population']
     
     featuresetsTrain = [(document_features(d), c) for (d,c) in global_listDocTrain]
-    featuresetsText = [(document_features(d), c) for (d,c) in listDocTest]
+    featuresetsTest = [(document_features(d), c) for (d,c) in listDocTest]
 #        print document_features_index(d, global_list_Word_features)
 #    print '\ndocument_features(favorDiagnostic): ', document_features(favorDiagnostic)
     
@@ -204,8 +200,8 @@ def fSubprocess(idxCrossValidation):
 #        print '\nfeaturesets: ', len(featuresetsTrain), featuresetsTrain[1]
 #        print '\nfeaturesets: ', len(featuresetsTrain), featuresetsTrain[-1]
 
-#        featuresetsText = [(document_features_index(d), c) for (d,c) in listDocTest]
-#        print 'sys.getsizeof(featuresetsText): ', sys.getsizeof(featuresetsText), 'ratioWordFeature: ', ratioWordFeature
+#        featuresetsTest = [(document_features_index(d), c) for (d,c) in listDocTest]
+#        print 'sys.getsizeof(featuresetsTest): ', sys.getsizeof(featuresetsTest), 'ratioWordFeature: ', ratioWordFeature
 
 #        continue
     # featuresetsTrain(1/3):  360 [({'bolus': False, 'magnetic': False, 'colonoscopy': False ... }, 'int')
@@ -217,23 +213,72 @@ def fSubprocess(idxCrossValidation):
 #                train_set, test_set = featuresetsTrain[sizeTest:], featuresetsTrain[:sizeTest]
 #                classifier = nltk.NaiveBayesClassifier.train(train_set)
     classifier = nltk.NaiveBayesClassifier.train(featuresetsTrain)
+#    print 'classifier.labels(): ', classifier.labels(), classifier.labels()[0], classifier.labels()[1] 
+#    exit()
 
 
 #                with open(dirMain+dirOutputMergeFile+typeTextPreprocess+'-'+str(idxCrossValidation)+'-Train-'+'.csv', 'a') as outfFullTrain:
     with open(dirMain+dirOutput_accuracy+typeTextPreprocess+'-accuracy.csv', 'a') as outfAccuracy:
-#                    myAccruacyData = 'ratioWordFeature,' + str(ratioWordFeature) +','+ '-'.join(listFilesInputPair) + ',idxCrossValidation,' + str(idxCrossValidation)+',accuracy,' + str(nltk.classify.accuracy(classifier, featuresetsText)) +'\n'
-#        myAccruacyData = str(ratioWordFeature) +','+ '-'.join(listFilesInputPair) +','+ str(idxCrossValidation) +','+ str(nltk.classify.accuracy(classifier, featuresetsText)) +'\n'
-#        myAccruacyData = str(ratioWordFeature) +','+ '-'.join([listFilesInputPair[0][0], listFilesInputPair[1][0]]) +','+ str(idxCrossValidation) +','+ str(nltk.classify.accuracy(classifier, featuresetsText)) +'\n'
-        myAccruacyData = str(ratioWordFeature) +','+ '-'.join([listFilesInputPair[0][0], labelNaiveBayes]) +','+ str(idxCrossValidation) +','+ str(nltk.classify.accuracy(classifier, featuresetsText)) +'\n'
-        
+#                    myAccruacyData = 'ratioWordFeature,' + str(ratioWordFeature) +','+ '-'.join(listFilesInputPair) + ',idxCrossValidation,' + str(idxCrossValidation)+',accuracy,' + str(nltk.classify.accuracy(classifier, featuresetsTest)) +'\n'
+#        myAccruacyData = str(ratioWordFeature) +','+ '-'.join(listFilesInputPair) +','+ str(idxCrossValidation) +','+ str(nltk.classify.accuracy(classifier, featuresetsTest)) +'\n'
+#        myAccruacyData = str(ratioWordFeature) +','+ '-'.join([listFilesInputPair[0][0], listFilesInputPair[1][0]]) +','+ str(idxCrossValidation) +','+ str(nltk.classify.accuracy(classifier, featuresetsTest)) +'\n'
+        myAccruacyData = str(ratioWordFeature) +','+ '-'.join([listFilesInputPair[0][0], labelNaiveBayes]) +','+ str(idxCrossValidation) +','+ str(nltk.classify.accuracy(classifier, featuresetsTest)) +'\n'
+
         print 'myAccruacyData: ', myAccruacyData
+
         outfAccuracy.write(myAccruacyData)
 #                    exit()
-#                    outfAccuracy.write(myAccruacyData)
+#                    outfAccuracy.write(myAccruacyData)I do
 #                    outfAccuracy.write()
 #        print myAccruacyData
     
+
+
+    refsets = collections.defaultdict(set)
+    testsets = collections.defaultdict(set)
+     
+    for i, (feats, label) in enumerate(featuresetsTest):
+#        print 'feats: ', feats
+#        print 'label: ', label
+        refsets[label].add(i)
+#        print 'refsets[label]: ', type(refsets[label]), refsets[label]
+#        exit()
+        observed = classifier.classify(feats)
+#        print 'observed: ', "type(observed)", type(observed), observed
+        testsets[observed].add(i)
+#    print 'testsets: ', testsets
+#    exit()
+#    print 'fPrecisionRecall(classifier, testfeats): ', nltkPrecisionRecallFMeasure2.fPrecisionRecall(classifier, featuresetsTest)
+    classifier.labels()[0], classifier.labels()[1] 
     
+    posPrecision = nltk.metrics.precision(refsets[labelPos], testsets[labelPos])
+    posRecall = nltk.metrics.recall(refsets[labelPos], testsets[labelPos])
+    posRmeasure = nltk.metrics.f_measure(refsets[labelPos], testsets[labelPos])
+    negPrecision = nltk.metrics.precision(refsets[labelNeg], testsets[labelNeg])
+    negRecall = nltk.metrics.recall(refsets[labelNeg], testsets[labelNeg])
+    negFmeasure = nltk.metrics.f_measure(refsets[labelNeg], testsets[labelNeg])
+#    
+#    print 'pos precision:', nltk.metrics.precision(refsets['pos'], testsets['pos'])
+#    print 'pos recall:', nltk.metrics.recall(refsets['pos'], testsets['pos'])
+#    print 'pos F-measure:', nltk.metrics.f_measure(refsets['pos'], testsets['pos'])
+#    print 'neg precision:', nltk.metrics.precision(refsets['neg'], testsets['neg'])
+#    print 'neg recall:', nltk.metrics.recall(refsets['neg'], testsets['neg'])
+#    print 'neg F-measure:', nltk.metrics.f_measure(refsets['neg'], testsets['neg'])
+
+    
+    with open(dirMain+dirOutput_accuracy+typeTextPreprocess+'-PreRecFmea.csv', 'a') as outfPreRecFmea:
+#        myPreRecFmeaData = str(ratioWordFeature) +','+ '-'.join([listFilesInputPair[0][0], labelNaiveBayes]) +','+ str(idxCrossValidation) +','+ str(nltk.classify.accuracy(classifier, featuresetsTest)) +'\n'
+#        myPreRecFmeaData = str(posPrecision) +','+ str(posRecall) +','+ str(posRmeasure) +','+ str(negPrecision) +','+ str(negRecall) +','+ str(negFmeasure) +'\n'
+        myPreRecFmeaData = str(ratioWordFeature) +','+ '-'.join([listFilesInputPair[0][0], labelNaiveBayes]) +','+ str(idxCrossValidation) +','+str(posPrecision) +','+ str(posRecall) +','+ str(posRmeasure) +','+ str(negPrecision) +','+ str(negRecall) +','+ str(negFmeasure) +'\n'
+ 
+        print 'myPreRecFmeaData: ', myPreRecFmeaData
+
+        outfPreRecFmea.write(myPreRecFmeaData)
+        
+    
+    
+    
+    #    print 'pos F-measure:', nltk.metrics.f_measure(refsets['pos'], testsets['pos'])
     cpdist = classifier._feature_probdist
 #                print 'classifier.most_informative_features(10):', classifier.most_informative_features(10)
     
@@ -320,6 +365,10 @@ def fNaiveBayesTraining(numFold=10):
 
         print 'myAccruacyData: ', myAccruacyData
     
+    with open(dirMain+dirOutput_accuracy+typeTextPreprocess+'-PreRecFmea.csv', 'a') as outfPreRecFmea:
+        myPreRecFmeaData = 'ratioWordFeature,' + 'listFilesInputPair,' + 'idxCrossValidation,' + 'posPrecision,'+ 'posRecall,'+ 'posRmeasure,'+ 'negPrecision,'+ 'negRecall,'+ 'negFmeasure\n'
+#        myPreRecFmeaData = str(posPrecision) +','+ str(posRecall) +','+ str(posRmeasure) +','+ str(negPrecision) +','+ str(negRecall) +','+ str(negFmeasure) +'\n'
+        outfPreRecFmea.write(myPreRecFmeaData)
 
     
 #    wordFeatureRatio10times = 0.1

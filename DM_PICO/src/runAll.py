@@ -20,14 +20,16 @@ import readExcel
 import mergePioTestFiles
 #import readPIO5
 #import pioNaiveBayes
-import subprocess4Pico
+#import subprocess4Pico
+import subprocess4Pico3
 
-numFold = 10
+numFold = 5
 
 readExcel.fReadExcel()
 mergePioTestFiles.fCreadeCrossValidationFiles(numFold)
 #pioNaiveBayes.fNaiveBayesTraining(numFold)
-subprocess4Pico.fNaiveBayesTraining(numFold)
+#subprocess4Pico.fNaiveBayesTraining(numFold)
+subprocess4Pico3.fNaiveBayesTraining(numFold)
 exit()
 
 #import writeConfigObj
