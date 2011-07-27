@@ -253,12 +253,6 @@ def fSubprocess(idxCrossValidation):
 #    print 'fPrecisionRecall(classifier, testfeats): ', nltkPrecisionRecallFMeasure2.fPrecisionRecall(classifier, featuresetsTest)
     classifier.labels()[0], classifier.labels()[1] 
 
-    myAccruacyData = str(ratioWordFeature)\
-         +','+ '-'.join([listFilesInputPair[0][0], labelNaiveBayes])\
-         +','+ str(idxCrossValidation)\
-         +','+ str(nltk.classify.accuracy(classifier, featuresetsTest)) +'\n'
-
-    
     posPrecision = nltk.metrics.precision(refsets[labelPos], testsets[labelPos])
     posRecall = nltk.metrics.recall(refsets[labelPos], testsets[labelPos])
     posFmeasure = nltk.metrics.f_measure(refsets[labelPos], testsets[labelPos])
