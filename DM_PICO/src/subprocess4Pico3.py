@@ -222,7 +222,9 @@ def fSubprocess(idxCrossValidation):
 #                    myAccruacyData = 'ratioWordFeature,' + str(ratioWordFeature) +','+ '-'.join(listFilesInputPair) + ',idxCrossValidation,' + str(idxCrossValidation)+',accuracy,' + str(nltk.classify.accuracy(classifier, featuresetsTest)) +'\n'
 #        myAccruacyData = str(ratioWordFeature) +','+ '-'.join(listFilesInputPair) +','+ str(idxCrossValidation) +','+ str(nltk.classify.accuracy(classifier, featuresetsTest)) +'\n'
 #        myAccruacyData = str(ratioWordFeature) +','+ '-'.join([listFilesInputPair[0][0], listFilesInputPair[1][0]]) +','+ str(idxCrossValidation) +','+ str(nltk.classify.accuracy(classifier, featuresetsTest)) +'\n'
-        myAccruacyData = str(ratioWordFeature) +','+ '-'.join([listFilesInputPair[0][0], labelNaiveBayes]) +','+ str(idxCrossValidation) +','+ str(nltk.classify.accuracy(classifier, featuresetsTest)) +'\n'
+#        myAccruacyData = str(ratioWordFeature) +','+ '-'.join([listFilesInputPair[0][0], labelNaiveBayes]) +','+ str(idxCrossValidation) +','+ str(nltk.classify.accuracy(classifier, featuresetsTest)) +'\n'
+        myAccruacy = nltk.classify.accuracy(classifier, featuresetsTest)
+        myAccruacyData = str(ratioWordFeature) +','+ '-'.join([listFilesInputPair[0][0], labelNaiveBayes]) +','+ str(idxCrossValidation) +','+ str(myAccruacy) +'\n'
 
         print 'myAccruacyData: ', myAccruacyData
 
@@ -250,10 +252,16 @@ def fSubprocess(idxCrossValidation):
 #    exit()
 #    print 'fPrecisionRecall(classifier, testfeats): ', nltkPrecisionRecallFMeasure2.fPrecisionRecall(classifier, featuresetsTest)
     classifier.labels()[0], classifier.labels()[1] 
+
+    myAccruacyData = str(ratioWordFeature)\
+         +','+ '-'.join([listFilesInputPair[0][0], labelNaiveBayes])\
+         +','+ str(idxCrossValidation)\
+         +','+ str(nltk.classify.accuracy(classifier, featuresetsTest)) +'\n'
+
     
     posPrecision = nltk.metrics.precision(refsets[labelPos], testsets[labelPos])
     posRecall = nltk.metrics.recall(refsets[labelPos], testsets[labelPos])
-    posRmeasure = nltk.metrics.f_measure(refsets[labelPos], testsets[labelPos])
+    posFmeasure = nltk.metrics.f_measure(refsets[labelPos], testsets[labelPos])
     negPrecision = nltk.metrics.precision(refsets[labelNeg], testsets[labelNeg])
     negRecall = nltk.metrics.recall(refsets[labelNeg], testsets[labelNeg])
     negFmeasure = nltk.metrics.f_measure(refsets[labelNeg], testsets[labelNeg])
@@ -268,8 +276,52 @@ def fSubprocess(idxCrossValidation):
     
     with open(dirMain+dirOutput_accuracy+typeTextPreprocess+'-PreRecFmea.csv', 'a') as outfPreRecFmea:
 #        myPreRecFmeaData = str(ratioWordFeature) +','+ '-'.join([listFilesInputPair[0][0], labelNaiveBayes]) +','+ str(idxCrossValidation) +','+ str(nltk.classify.accuracy(classifier, featuresetsTest)) +'\n'
-#        myPreRecFmeaData = str(posPrecision) +','+ str(posRecall) +','+ str(posRmeasure) +','+ str(negPrecision) +','+ str(negRecall) +','+ str(negFmeasure) +'\n'
-        myPreRecFmeaData = str(ratioWordFeature) +','+ '-'.join([listFilesInputPair[0][0], labelNaiveBayes]) +','+ str(idxCrossValidation) +','+str(posPrecision) +','+ str(posRecall) +','+ str(posRmeasure) +','+ str(negPrecision) +','+ str(negRecall) +','+ str(negFmeasure) +'\n'
+#        myPreRecFmeaData = str(posPrecision) +','+ str(posRecall) +','+ str(posFmeasure) +','+ str(negPrecision) +','+ str(negRecall) +','+ str(negFmeasure) +'\n'
+#        myPreRecFmeaData = str(ratioWordFeature) +','+ '-'.join([listFilesInputPair[0][0], labelNaiveBayes]) +','+ str(idxCrossValidation) +','+str(posPrecision) +','+ str(posRecall) +','+ str(posFmeasure) +','+ str(negPrecision) +','+ str(negRecall) +','+ str(negFmeasure) +'\n'
+
+        myPreRecFmeaData = \
+            str(ratioWordFeature)\
+            +','+ '-'.join([listFilesInputPair[0][0], labelNaiveBayes])\
+            +','+ str(idxCrossValidation)\
+            +', posPrecision'\
+            +','+ str(posPrecision)\
+            +'\n'\
+            +str(ratioWordFeature)\
+            +','+ '-'.join([listFilesInputPair[0][0], labelNaiveBayes])\
+            +','+ str(idxCrossValidation)\
+            +', posRecall'\
+            +','+ str(posRecall)\
+            +'\n'\
+            +str(ratioWordFeature)\
+            +','+ '-'.join([listFilesInputPair[0][0], labelNaiveBayes])\
+            +','+ str(idxCrossValidation)\
+            +', posRmeasure'\
+            +','+ str(posFmeasure)\
+            +'\n'\
+            +str(ratioWordFeature)\
+            +','+ '-'.join([listFilesInputPair[0][0], labelNaiveBayes])\
+            +','+ str(idxCrossValidation)\
+            +', negPrecision'\
+            +','+ str(negPrecision)\
+            +'\n'\
+            +str(ratioWordFeature)\
+            +','+ '-'.join([listFilesInputPair[0][0], labelNaiveBayes])\
+            +','+ str(idxCrossValidation)\
+            +', negRecall'\
+            +','+ str(negRecall)\
+            +'\n'\
+            +str(ratioWordFeature)\
+            +','+ '-'.join([listFilesInputPair[0][0], labelNaiveBayes])\
+            +','+ str(idxCrossValidation)\
+            +', negFmeasure'\
+            +','+ str(negFmeasure)\
+            +'\n'\
+            +str(ratioWordFeature)\
+            +','+ '-'.join([listFilesInputPair[0][0], labelNaiveBayes])\
+            +','+ str(idxCrossValidation)\
+            +', myAccruacy'\
+            +','+ str(myAccruacy)\
+            +'\n'
  
         print 'myPreRecFmeaData: ', myPreRecFmeaData
 
@@ -366,8 +418,9 @@ def fNaiveBayesTraining(numFold=10):
         print 'myAccruacyData: ', myAccruacyData
     
     with open(dirMain+dirOutput_accuracy+typeTextPreprocess+'-PreRecFmea.csv', 'a') as outfPreRecFmea:
-        myPreRecFmeaData = 'ratioWordFeature,' + 'listFilesInputPair,' + 'idxCrossValidation,' + 'posPrecision,'+ 'posRecall,'+ 'posRmeasure,'+ 'negPrecision,'+ 'negRecall,'+ 'negFmeasure\n'
 #        myPreRecFmeaData = str(posPrecision) +','+ str(posRecall) +','+ str(posRmeasure) +','+ str(negPrecision) +','+ str(negRecall) +','+ str(negFmeasure) +'\n'
+#        myPreRecFmeaData = 'ratioWordFeature,' + 'listFilesInputPair,' + 'idxCrossValidation,' + 'posPrecision,'+ 'posRecall,'+ 'posRmeasure,'+ 'negPrecision,'+ 'negRecall,'+ 'negFmeasure\n'
+        myPreRecFmeaData = 'ratioWordFeature,' + 'listFilesInputPair,' + 'idxCrossValidation,' + 'testType,'+ 'testValue\n'
         outfPreRecFmea.write(myPreRecFmeaData)
 
     
