@@ -8,6 +8,10 @@ Output:
     '(stp-(int|out|pat).csv)'
     '(/Output2/stp-(\d)-Per-(int|out|pat)-(Test|Train)-.txt)'
 '''
+
+import sys
+import logging
+from configobj import ConfigObj
 import os
 import re
 import random
@@ -17,6 +21,19 @@ import shutil
 import xpermutations # http://code.activestate.com/recipes/190465-generator-for-permutations-combinations-selections/
 from crossValidation import k_fold_cross_validation
 
+logging.basicConfig(level=logging.DEBUG)
+
+logging.debug("sys.argv[0]: "+sys.argv[0])
+
+config = ConfigObj('scirev.cfg')
+
+#flagForceRefetchPubmed = int(config['flagForceRefetchPubmed'])
+numFold = int(config['numFold'])
+logging.debug("numFold: "+str(numFold))
+
+if not(numFold): 
+    numFold = 3
+    logging.debug("numFold: "+str(numFold))
 
 def document_features(document, argListWordFeatures):
 #def document_features(document, listWordFeatures):
@@ -29,7 +46,8 @@ def document_features(document, argListWordFeatures):
     return features
 
 
-def fCreadeCrossValidationFiles(numFold=10):
+def fCreadeCrossValidationFiles(numFold):
+
     
 #    numFold = 10
     
@@ -137,4 +155,4 @@ def fCreadeCrossValidationFiles(numFold=10):
                     idxCrossValidation = idxCrossValidation + 1 
 
 if __name__ == "__main__":
-    fCreadeCrossValidationFiles()
+    fCreadeCrossValidationFiles(numFold)

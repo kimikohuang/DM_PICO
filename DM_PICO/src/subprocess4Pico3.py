@@ -8,24 +8,47 @@ Output:
     typeTextPreprocess+'Percentage' + '-'+ filesInput[4:7]
     Output3_Divide2
 '''
+
+import sys
+import logging
+from configobj import ConfigObj
 import os
 import re
-import random
+#import random
 import nltk
 import csv
 import shutil
 import xpermutations # http://code.activestate.com/recipes/190465-generator-for-permutations-combinations-selections/
-import sys
 from multiprocessing import Process
 #import nltkPrecisionRecallFMeasure2
 import collections
 
-flagComplements = True
+logging.basicConfig(level=logging.DEBUG)
+
+logging.debug("sys.argv[0]: "+sys.argv[0])
+
+config = ConfigObj('scirev.cfg')
+
+#flagForceRefetchPubmed = int(config['flagForceRefetchPubmed'])
+numFold = int(config['numFold'])
+logging.debug("numFold: "+str(numFold))
+
+if not(numFold): 
+    numFold = 3
+    logging.debug("numFold: "+str(numFold))
+
+flagComplements = int(config['flagComplements'])
+
+wordFeatureRatioStart10times = int(config['wordFeatureRatioStart10times'])
+wordFeatureRatioStop10times = int(config['wordFeatureRatioStop10times'])
+wordFeatureRatioStep10times = int(config['wordFeatureRatioStep10times'])
+
+#flagComplements = True
 #flagComplements = False
 
-wordFeatureRatioStart10times = 1 # default = 3
-wordFeatureRatioStop10times = 27 # default =10 not include
-wordFeatureRatioStep10times = 5 # default =10
+#wordFeatureRatioStart10times = 21 # default = 3
+#wordFeatureRatioStop10times = 27 # default =10 not include
+#wordFeatureRatioStep10times = 5 # default =10
 
 
 dirMain = ''
@@ -42,8 +65,9 @@ listFilesInputFilenameStem = ['int', 'out', 'pat']
 #    listMyType = ['stp-', 'wnl-', 'ptr-']
 #typeTextPreprocess = ''
 #typeTextPreprocess = 'stp-'
-typeTextPreprocess = 'wnl-'
+#typeTextPreprocess = 'wnl-'
 #typeTextPreprocess = 'ptr-'
+typeTextPreprocess = config['typeTextPreprocess']
 
 global_list_Word_features = []
 ratioWordFeature = 0.0

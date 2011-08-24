@@ -16,6 +16,10 @@ output
     6_topicHighestCorr.csv
 """
 
+import logging
+import writeConfigObj
+import sys
+from configobj import ConfigObj
 import readExcel
 import mergePioTestFiles
 #import readPIO5
@@ -23,58 +27,27 @@ import mergePioTestFiles
 #import subprocess4Pico
 import subprocess4Pico3
 
-numFold = 5
+logging.basicConfig(level=logging.DEBUG)
+
+#print sys.argv[0]
+logging.debug("sys.argv[0]: "+sys.argv[0])
+
+writeConfigObj.fwriteConfigObj()
+
+config = ConfigObj('scirev.cfg')
+
+numFold = int(config['numFold'])
+logging.debug("config.filename: "+sys.argv[0])
 
 readExcel.fReadExcel()
 mergePioTestFiles.fCreadeCrossValidationFiles(numFold)
 #pioNaiveBayes.fNaiveBayesTraining(numFold)
 #subprocess4Pico.fNaiveBayesTraining(numFold)
 subprocess4Pico3.fNaiveBayesTraining(numFold)
-exit()
 
-#import writeConfigObj
-import sys
-from configobj import ConfigObj
-#import aXml2input
-import bioPyEfetchPubmed
-import aText2input
-import bEstimation
-import cInfAll
-import dCorrPhiStdTKey
-import eSortDoc4aTopic
-import fGetNewPhi
-import pgvTk
-import os
-import logging
 
-writeConfigObj.fwriteConfigObj()
 
-print sys.argv[0]
-config = ConfigObj('scirev.cfg')
-XmlOrText = config['XmlOrText']
-strDefaultKeyword = config['strDefaultKeyword']
-DirMain  = config['dirname'][config['DirMain'][strDefaultKeyword][0]]+config['DirMain'][strDefaultKeyword][1]
-flagForceRefetchPubmed = int(config['flagForceRefetchPubmed'])
 
-if XmlOrText == 'Xml':
-    __import__(aXml2input)
-    aXml2input.fXml2input()
-elif XmlOrText == 'Text':
-    logging.debug(str(flagForceRefetchPubmed) + str(not os.path.isfile(DirMain + strDefaultKeyword+"_papers.txt")) + DirMain + strDefaultKeyword+"_papers.txt")
-    
-    if flagForceRefetchPubmed or (not os.path.isfile(DirMain + strDefaultKeyword+"_papers.txt")):
-        logging.debug("Refetch Pubmed!")
-        bioPyEfetchPubmed.fbioPyEfetchPubmed()
-    else:
-        logging.debug(str(not flagForceRefetchPubmed))
 
-    aText2input.fText2input()
-else:
-    print 'Miss XmlOrText on scirev.cfg file'
 
-#bEstimation.fEstimation()
-#cInfAll.fInfAll()
-dCorrPhiStdTKey.fCorrPhiStdTkey()
-eSortDoc4aTopic.fXortDoc4aTopic()
-fGetNewPhi.fGetNewPhi()
-pgvTk.fGraphvizTkinter()
+
