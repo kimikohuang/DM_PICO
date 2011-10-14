@@ -18,12 +18,30 @@ def fwriteConfigObj():
     strDefaultKeyword = ''.join(searchTerm.split())
     logging.debug("strDefaultKeyword: "+strDefaultKeyword)
     
-    config['numFold'] = 10
+    #LEVELS = {'debug': logging.DEBUG,
+    #          'info': logging.INFO,
+    #          'warning': logging.WARNING,
+    #          'error': logging.ERROR,
+    #          'critical': logging.CRITICAL}
+    
+#    config['level'] = logging.DEBUG     # 10
+    config['level'] = logging.INFO      # 20
+    print "config['level']: ", config['level']
+    config['numFold'] = 3
     config['flagComplements'] = 1 # 1 or 0
+    config['flagOnlyTrainingUsingExistingData'] = 0 # 1 or 0
+    config['flagNaiveBayesTraining'] = 0 # 1 or 0
+    
     
     config['wordFeatureRatioStart10times'] = 1
-    config['wordFeatureRatioStop10times'] = 21
+    config['wordFeatureRatioStop10times'] = 14
     config['wordFeatureRatioStep10times'] = 1
+
+    config['InputFileFormat'] = 'readMedline' # readExcel, readMedline  
+    
+    config['InputFileLocation'] = "/home/kimiko/Downloads"  
+    config['InputFilename'] = "pubmed_result(11).txt"  
+
 #wordFeatureRatioStart10times = 21 # default = 3
 #wordFeatureRatioStop10times = 27 # default =10 not include
 #wordFeatureRatioStep10times = 5 # default =10
@@ -35,6 +53,12 @@ def fwriteConfigObj():
 #typeTextPreprocess = 'ptr-'
     config['typeTextPreprocess'] = 'wnl-'
 
+
+    config['readRIS'] = {}
+    config['readRIS']['flagSentenceSplitter'] = 1 # 1 or 0
+    
+
+#    config['readRIS']['dirnameHome'] = '/media/c82127d9-0751-40f8-a1df-ba42d8c58846/home/kimiko/Downloads/dLda'
     
 #    config['strDefaultKeyword'] = strDefaultKeyword    
 #    config['searchTerm'] = searchTerm
