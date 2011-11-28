@@ -1,6 +1,7 @@
 #!/usr/bin/python
-# Filename: readMedline.py
 """
+Filename:
+    readMedline.py
 input
     # Filename: writeConfigObj.py
         config['InputFileLocation'] = "/home/kimiko/Downloads"  
@@ -9,6 +10,8 @@ output
     fileNamePubmedTA = global_DirMain+'pubmed_result_TiAb_org.txt'
     fNameP = global_DirMain+'fNameP.txt'
     filename = 'fName_'+strEachKey
+    pubmed_result_TiAb_org.txt
+    pubmed_result_TiAb_org.csv
 """
 
 #from lxml import objectify
@@ -25,12 +28,12 @@ import logging
 import shutil
 import nltk
 
-#LEVELS = {'debug': logging.DEBUG,
-#          'info': logging.INFO,
+#LEVELS = {'debug': logging.DEBUG,    10
+#          'info': logging.INFO,    20
 #          'warning': logging.WARNING,
 #          'error': logging.ERROR,
 #          'critical': logging.CRITICAL}
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 
 global_DirMain =''
@@ -66,12 +69,16 @@ def fReadMedline():
     logging.debug(sys.argv[0])
 
     InputFileLocation = config['InputFileLocation'] # = "/home/kimiko/Downloads"  
+    logging.info('InputFileLocation: '+ InputFileLocation)
+
     InputFilename = config['InputFilename'] # = "pubmed_result(5).txt"  
+    logging.info('InputFilename: '+ InputFilename)
 
 #    PubmedFile   = global_DirMain + 'a2.txt'
     PubmedFile   = InputFileLocation + '/' + InputFilename
     
-    print PubmedFile
+#    print PubmedFile
+    logging.info('PubmedFile: '+ PubmedFile)
 
     listPICO = ['P','I','O']
     ListNormalMethod = ['stpwRemoved', 'wnl', 'porter', 'lancaster']
@@ -80,8 +87,8 @@ def fReadMedline():
 
     #listMyType = ['stp-', 'wnl-', 'ptr-']
     #listMyType = ['stp-', 'wnl-']
-#    listMyType = ['wnl-']
     listMyType = ['wnl-']
+#    listMyType = []
     
     if 'wnl' in ListNormalMethod:
         wnl = nltk.WordNetLemmatizer()
@@ -99,7 +106,7 @@ def fReadMedline():
     
 
     
-#    fileNamePubmedTA = global_DirMain+'pubmed_result_TiAb_org.txt'
+#    fileNamePubmedTaCsv = global_DirMain+'pubmed_result_TiAb_org.txt'
 #    fNameP = global_DirMain+'fNameP.txt'
     fNameP = global_DirMain+'fNameP.txt'
     logging.debug('fNameP Start: '+ fNameP)
@@ -115,7 +122,8 @@ def fReadMedline():
 
     myPunktSentenceTokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
 
-    fileNamePubmedTA = global_DirMain+'pubmed_result_TiAb_org.txt'
+    fileNamePubmedTaCsv = global_DirMain+'pubmed_result_TiAb_org.csv'
+    fileNamePubmedTaTxt = global_DirMain+'pubmed_result_TiAb_org.txt'
 
     flagTi = False
     myTI = ''
@@ -125,8 +133,11 @@ def fReadMedline():
     flagHasAb = False
     strYear = ''
     strOneRecord = ''
-    myCsvWriter = csv.writer(open(fileNamePubmedTA, 'wb'), quoting=csv.QUOTE_MINIMAL)
+    myCsvWriter = csv.writer(open(fileNamePubmedTaCsv, 'wb'), quoting=csv.QUOTE_MINIMAL)
     dicHeading = {}
+
+    
+    myFileNamePubmedTaTxt = open(fileNamePubmedTaTxt,"w")
 
     with open(fNameP, 'w') as myCsvWriterP:
     
@@ -210,6 +221,10 @@ def fReadMedline():
                     if 'wnl-' in  listMyType:
                         listContent = [wnl.lemmatize(t) for t in listContent]
                         logging.debug("'wnl-' in  listMyType: "+' '.join(listContent))
+#                        myFileNamePubmedTaTxt.write(listWriteData.encode("utf-8")+'\n')
+#                        myFileNamePubmedTaTxt.write(listContent.encode("utf-8")+'\n')
+#                        myFileNamePubmedTaTxt.write(' '.join(listContent).encode("utf-8")+'\n')
+                        myFileNamePubmedTaTxt.write(pmid+'\t'+' '.join(listContent).encode("utf-8")+'\n')
                         
                     if len(listContent) < 5 or listContent[1]<>':':
                         continue
@@ -279,6 +294,6 @@ def fReadMedline():
 ##                myCsvWriterKey.write(listWriteData.encode("utf-8")+'\n')
 #                myCsvWriterKey.write(dicHeading(strEachKey).encode("utf-8")+'\n')
 
-        
+    myFileNamePubmedTaTxt.close()    
 if __name__ == "__main__":
     fReadMedline()
