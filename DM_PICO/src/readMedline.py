@@ -28,12 +28,28 @@ import logging
 import shutil
 import nltk
 
+
+config = ConfigObj('scirev.cfg')
+
+myLevel = int(config['level'])
+
+logging.basicConfig(level=myLevel)
+
+LOG_FILENAME = '/home/kimiko/git/DM_PICO/DM_PICO/src/example.log'
+logging.basicConfig(filename=LOG_FILENAME,level=logging.INFO)
+
+#logging.basicConfig(level='logging.DEBUG')
+
+logging.debug("sys.argv[0]: "+sys.argv[0])
+
 #LEVELS = {'debug': logging.DEBUG,    10
 #          'info': logging.INFO,    20
 #          'warning': logging.WARNING,
 #          'error': logging.ERROR,
 #          'critical': logging.CRITICAL}
-logging.basicConfig(level=logging.DEBUG)
+#logging.basicConfig(level=logging.DEBUG)
+#logging.basicConfig(level=myLevel)
+
 
 
 global_DirMain =''
