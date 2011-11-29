@@ -4,14 +4,14 @@ Filename:
     readMedline.py
 input
     # Filename: writeConfigObj.py
+    scirev.cfg
         config['InputFileLocation'] = "/home/kimiko/Downloads"  
         config['InputFilename'] = "pubmed_result(11).txt"
 output
-    fileNamePubmedTA = global_DirMain+'pubmed_result_TiAb_org.txt'
-    fNameP = global_DirMain+'fNameP.txt'
-    filename = 'fName_'+strEachKey
-    pubmed_result_TiAb_org.txt
-    pubmed_result_TiAb_org.csv
+    dirCwd+dirOutput+'/'+'pubmed_result_TiAb_org.csv'
+    dirCwd+dirOutput+'/'+'pubmed_result_TiAb_org.txt'
+    dirCwd+dirOutput+'/'+'pubmed_Heading.txt'
+    dirCwd+dirOutput+'/'+'fName_'+strEachKey
 """
 
 #from lxml import objectify
@@ -112,6 +112,17 @@ def fReadMedline():
         myPorterStemmer = nltk.PorterStemmer()
     if 'lancaster' in ListNormalMethod:
         myLancasterStemmer = nltk.LancasterStemmer()
+
+    dirOutput = InputFilename
+    #for typeTextPreprocess in listMyType:
+    dirCwd = os.getcwd()+'/'
+    if os.path.isdir(dirCwd+dirOutput):
+        try:
+    #            shutil.rmtree(LDASubDataDir, ignore_errors, onerror)
+            shutil.rmtree(dirCwd+dirOutput)
+        except:
+            raise
+    os.mkdir(dirCwd+dirOutput)
     
 
     with open(PubmedFile) as fTxtOrg:
@@ -122,24 +133,30 @@ def fReadMedline():
     
 
     
-#    fileNamePubmedTaCsv = global_DirMain+'pubmed_result_TiAb_org.txt'
-#    fNameP = global_DirMain+'fNameP.txt'
-    fNameP = global_DirMain+'fNameP.txt'
-    logging.debug('fNameP Start: '+ fNameP)
-#    myCsvWriterP = csv.writer(open(fNameP, 'wb'), quoting=csv.QUOTE_MINIMAL)
-
-    fNameI = global_DirMain+'fNameI.txt'
-    logging.debug('fNameI Start: '+ fNameI)
-#    myCsvWriterI = csv.writer(open(fNameI, 'wb'), quoting=csv.QUOTE_MINIMAL)
-
-    fNameO = global_DirMain+'fNameO.txt'
-    logging.debug('fNameO Start: '+ fNameP)
-#    myCsvWriterO = csv.writer(open(fNameO, 'wb'), quoting=csv.QUOTE_MINIMAL)
+##    fNamePubmedTaCsv = global_DirMain+'pubmed_result_TiAb_org.txt'
+##    fNameHeading = global_DirMain+'fNameHeading.txt'
+##    fNameHeading = global_DirMain+'fNameHeading.txt'
+    fNameHeading = dirCwd+dirOutput+'/'+'pubmed_Heading.txt'
+#    
+    logging.debug('fNameHeading Start: '+ fNameHeading)
+##    myCsvWriterP = csv.writer(open(fNameHeading, 'wb'), quoting=csv.QUOTE_MINIMAL)
+#
+##    fNameI = global_DirMain+'fNameI.txt'
+#    fNameI = dirCwd+dirOutput+'/'+'fNameI.txt'
+#    
+#    logging.debug('fNameI Start: '+ fNameI)
+##    myCsvWriterI = csv.writer(open(fNameI, 'wb'), quoting=csv.QUOTE_MINIMAL)
+#
+##    fNameO = global_DirMain+'fNameO.txt'
+#    fNameO = dirCwd+dirOutput+'/'+'fNameO.txt'
+#    
+#    logging.debug('fNameO Start: '+ fNameO)
+##    myCsvWriterO = csv.writer(open(fNameO, 'wb'), quoting=csv.QUOTE_MINIMAL)
 
     myPunktSentenceTokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
 
-    fileNamePubmedTaCsv = global_DirMain+'pubmed_result_TiAb_org.csv'
-    fileNamePubmedTaTxt = global_DirMain+'pubmed_result_TiAb_org.txt'
+    fNamePubmedTaCsv = global_DirMain+'pubmed_result_TiAb_org.csv'
+    fNamePubmedTaTxt = global_DirMain+'pubmed_result_TiAb_org.txt'
 
     flagTi = False
     myTI = ''
@@ -149,13 +166,13 @@ def fReadMedline():
     flagHasAb = False
     strYear = ''
     strOneRecord = ''
-    myCsvWriter = csv.writer(open(fileNamePubmedTaCsv, 'wb'), quoting=csv.QUOTE_MINIMAL)
+    myCsvWriter = csv.writer(open(dirCwd+dirOutput+'/'+fNamePubmedTaCsv, 'wb'), quoting=csv.QUOTE_MINIMAL)
     dicHeading = {}
 
     
-    myFileNamePubmedTaTxt = open(fileNamePubmedTaTxt,"w")
+    myFileNamePubmedTaTxt = open(dirCwd+dirOutput+'/'+fNamePubmedTaTxt,"w")
 
-    with open(fNameP, 'w') as myCsvWriterP:
+    with open(fNameHeading, 'w') as myCsvWriterP:
     
         for oneRow in listDocOrg:
             
@@ -286,12 +303,12 @@ def fReadMedline():
             strOneRecord = ''
             
         for strEachKey in dicHeading.keys():    
-            filename = 'fName_'+strEachKey
+            fNameEachKey = 'fName_'+strEachKey
 #            print 'strEachKey: ', strEachKey, ', len(dicHeading[strEachKey]): ', len(dicHeading[strEachKey])
 #            exit()
             # Create a file object:
             # in "write" mode
-            FILE = open(filename,"w")
+            FILE = open(dirCwd+dirOutput+'/'+fNameEachKey,"w")
             
             # Write all the lines at once:
 #            print len(dicHeading[strEachKey])
@@ -305,8 +322,8 @@ def fReadMedline():
             FILE.close()
             
 #        for strEachKey in dicHeading.keys():
-#            fNameP = 'fName_'+strEachKey
-#            with open(fNameP, 'w') as myCsvWriterKey:
+#            fNameHeading = 'fName_'+strEachKey
+#            with open(fNameHeading, 'w') as myCsvWriterKey:
 ##                myCsvWriterKey.write(listWriteData.encode("utf-8")+'\n')
 #                myCsvWriterKey.write(dicHeading(strEachKey).encode("utf-8")+'\n')
 
