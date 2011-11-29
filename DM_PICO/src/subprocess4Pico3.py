@@ -7,7 +7,7 @@ Output:
     './Output3_Divide0.31/(wnl|stp)-(\d)-Per-(int|out|pat)-(Nin|Nou|Npa|int|out|pat).csv'
     typeTextPreprocess+'Percentage' + '-'+ filesInput[4:7]
     Output3_Divide2
-    test push
+    test git branch
 '''
 
 #import writeConfigObj
