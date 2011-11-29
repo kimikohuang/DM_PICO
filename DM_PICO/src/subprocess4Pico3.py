@@ -7,23 +7,35 @@ Output:
     './Output3_Divide0.31/(wnl|stp)-(\d)-Per-(int|out|pat)-(Nin|Nou|Npa|int|out|pat).csv'
     typeTextPreprocess+'Percentage' + '-'+ filesInput[4:7]
     Output3_Divide2
+    test push
 '''
 
-import sys
+#import writeConfigObj
+
+#writeConfigObj.fwriteConfigObj()
+
 import logging
 from configobj import ConfigObj
 import os
 import re
-#import random
 import nltk
 import csv
 import shutil
 import xpermutations # http://code.activestate.com/recipes/190465-generator-for-permutations-combinations-selections/
 from multiprocessing import Process
-#import nltkPrecisionRecallFMeasure2
 import collections
+import sys
 
-logging.basicConfig(level=logging.DEBUG)
+config = ConfigObj('scirev.cfg')
+
+level = int(config['level'])
+
+#logging.basicConfig(level=level)
+
+LOG_FILENAME = '/home/kimiko/git/DM_PICO/DM_PICO/src/example.log'
+logging.basicConfig(filename=LOG_FILENAME,level=logging.INFO)
+
+#logging.basicConfig(level='logging.DEBUG')
 
 logging.debug("sys.argv[0]: "+sys.argv[0])
 
@@ -31,12 +43,11 @@ config = ConfigObj('scirev.cfg')
 
 #flagForceRefetchPubmed = int(config['flagForceRefetchPubmed'])
 numFold = int(config['numFold'])
-logging.debug("numFold: "+str(numFold))
-
 if not(numFold): 
-    numFold = 3
+    logging.error("can't find numFold. Please run writeConfigObj frist! ")
+else:
     logging.debug("numFold: "+str(numFold))
-
+    
 flagComplements = int(config['flagComplements'])
 
 wordFeatureRatioStart10times = int(config['wordFeatureRatioStart10times'])
@@ -124,6 +135,7 @@ def fSubprocess(idxCrossValidation):
     
     global_listDocTrain = []
     listDocTest = []
+    listDocTestPmid = []
     
     listMyWordsTrain = []
     listMyWordsTest = []
@@ -165,7 +177,8 @@ def fSubprocess(idxCrossValidation):
             fileOneTrain= dirMain+dirInputTrainingSet+typeTextPreprocess+str(idxCrossValidation)+'-'+fileOne+'-Train-.csv'
             with open(fileOneTrain) as fTxtOrgTrain:
                 listDocOrgTrain = fTxtOrgTrain.readlines()
-    #                    print 'len(listDocOrgTrain): ', len(listDocOrgTrain), listDocOrgTrain
+#                print 'len(listDocOrgTrain): ', len(listDocOrgTrain), listDocOrgTrain
+                logging.debug('len(listDocOrgTrain): ' + str(len(listDocOrgTrain)) + ', listDocOrgTrain: ' + " ".join(listDocOrgTrain))
 
             fileOneTest= dirMain+dirInputTestingSet+typeTextPreprocess+str(idxCrossValidation)+'-'+fileOne+'-Test-.csv'
             with open(fileOneTest) as fTxtOrgTest:
@@ -180,17 +193,18 @@ def fSubprocess(idxCrossValidation):
     #            myResult = p.search(rowOfListDocOrgTrain)
     #            if myResult <> None:
     #                myData = re.sub('^Title: |^Abstract: ','',myResult.group())
-                listMyWordsTrain.extend(rowOfListDocOrgTrain.split())
+                listMyWordsTrain.extend(rowOfListDocOrgTrain.split()[1:-1])
     #                global_listDocTrain.append((myData.split(),fileOne[9:11]))
     #                        print '(rowOfListDocOrgTrain.split(),outputFileNameDiff): ', (outputFileNameDiff, rowOfListDocOrgTrain.split())
 #                labelNaiveBayes = outputFileNameDiff
-                global_listDocTrain.append((rowOfListDocOrgTrain.split(), labelNaiveBayes))
+                global_listDocTrain.append((rowOfListDocOrgTrain.split()[1:-1], labelNaiveBayes))
     #               (for fileOne in listFilesInputPair:) END
     
             for rowOfListDocOrgTest in listDocOrgTest:
-                listMyWordsTest.extend(rowOfListDocOrgTest.split())
+                listMyWordsTest.extend(rowOfListDocOrgTest.split()[1:-1])
 #                listDocTest.append((rowOfListDocOrgTest.split(), outputFileNameDiff))
-                listDocTest.append((rowOfListDocOrgTest.split(), labelNaiveBayes))
+                listDocTest.append((rowOfListDocOrgTest.split()[1:-1], labelNaiveBayes))
+                listDocTestPmid.append((rowOfListDocOrgTest.split()[0], labelNaiveBayes))
 
 
 #    print 'type(global_listDocTrain): ', type(global_listDocTrain), 'len(global_listDocTrain): ', len(global_listDocTrain)
@@ -202,11 +216,18 @@ def fSubprocess(idxCrossValidation):
     
     allWordsTrain = nltk.FreqDist(listMyWordsTrain)
 #                allWordsTest = nltk.FreqDist(listMyWordsTest)
-    print 'type(allWordsTrain): ', type(allWordsTrain), len(allWordsTrain)
+    print 'type(allWordsTrain): ', type(allWordsTrain), 'len(allWordsTrain): ', len(allWordsTrain)
+    logging.info('type(allWordsTrain): ' + str(type(allWordsTrain)) + 'len(allWordsTrain): ' + str(len(allWordsTrain)))
+    
 #        global_list_Word_features = allWordsTrain.keys()[:len(allWordsTrain)/10]
     global_list_Word_features = allWordsTrain.keys()[:int(len(allWordsTrain)*ratioWordFeature)]
+#    print 'allWordsTrain.keys()[-50:-1]: ', allWordsTrain.keys()[0:10], allWordsTrain.keys()[-1332:-1132]
+#    print 'allWordsTrain.keys()[-50:-1]: ', allWordsTrain.values()[-1332:-1132]
+#    print 'allWordsTrain.keys()[-50:-1]: ', allWordsTrain.hapaxes()
 #                word_features_Test = allWordsTrain.keys()[:len(allWordsTest)]
-    print 'ratioWordFeature: ', ratioWordFeature, 'global_list_Word_features: ', len(global_list_Word_features), type(global_list_Word_features), global_list_Word_features
+#    print 'ratioWordFeature: ', ratioWordFeature, 'global_list_Word_features: ', len(global_list_Word_features), type(global_list_Word_features), global_list_Word_features
+    logging.info('ratioWordFeature: ' + str(ratioWordFeature) + ', global_list_Word_features: ' + str(len(global_list_Word_features)) + str(type(global_list_Word_features)))
+    logging.debug(" ".join(global_list_Word_features))
     # global_list_Word_features:  1985 <type 'list'> ['patient', 'group', 'rate', 'day', 'n', 'treatment', 'using', 'outcome', 'week', 'clinical',
 #                exit()
     
@@ -251,32 +272,129 @@ def fSubprocess(idxCrossValidation):
         myAccruacyData = str(ratioWordFeature) +','+ '-'.join([listFilesInputPair[0][0], labelNaiveBayes]) +','+ str(idxCrossValidation) +','+ str(myAccruacy) +'\n'
 
         print 'myAccruacyData: ', myAccruacyData
+        logging.info('myAccruacyData: ' + myAccruacyData)            
+#        logging.info('observed: ' + "type(observed) "+str(type(observed)) + " " + observed + " "  + label + " "  + listDocTestPmid[i][0] + " "  + str(observed == label))            
+        
 
         outfAccuracy.write(myAccruacyData)
 #                    exit()
 #                    outfAccuracy.write(myAccruacyData)I do
-#                    outfAccuracy.write()
 #        print myAccruacyData
     
 
 
     refsets = collections.defaultdict(set)
     testsets = collections.defaultdict(set)
-     
+#    tmpPmidMain = ''
+    flagJumpNextPmid = False
+#    flagEverObservedEqualLabel = False
+#    idxTrueRec = 0
     for i, (feats, label) in enumerate(featuresetsTest):
 #        print 'feats: ', feats
 #        print 'label: ', label
-        refsets[label].add(i)
 #        print 'refsets[label]: ', type(refsets[label]), refsets[label]
 #        exit()
         observed = classifier.classify(feats)
-#        print 'observed: ', "type(observed)", type(observed), observed
-        testsets[observed].add(i)
+#        print type(observed), observed # <type 'str'> Npa
+
+#        if True:
+#        print ', listDocTestPmid[i][0]: ', listDocTestPmid[i][0], ', listDocTestPmid[i]: ', listDocTestPmid[i], ', len(listDocTestPmid[i][0]): ', len(listDocTestPmid[i][0])
+#        exit()
+        if len(listDocTestPmid[i][0]) <= 8:
+            refsets[label].add(i)
+            testsets[observed].add(i)
+            logging.info('observed: ' + observed + " label: "  + label + " "  + listDocTestPmid[i][0] + " "  + str(observed == label))            
+            
+#            print 'len(listDocTestPmid[i]) == 8:'
+#            exit()
+            
+        else:
+#        elif len(listDocTestPmid[i][0]) > 8:
+#            print ' elif len(listDocTestPmid[i]) > 8:'
+#            exit()
+
+            if flagJumpNextPmid:
+                continue
+            else:
+                if observed == label:
+                    flagJumpNextPmid = True
+                    refsets[label].add(i)
+                    testsets[observed].add(i)
+                    logging.info('observed: ' + observed + " label: "  + label + " "  + listDocTestPmid[i][0] + " "  + str(observed == label))
+                    continue            
+                elif listDocTestPmid[i][0][9] <> 'e':
+                    flagJumpNextPmid =False
+                    refsets[label].add(i)
+                    testsets[observed].add(i)
+                    logging.info('observed: ' + observed + " label: "  + label + " "  + listDocTestPmid[i][0] + " "  + str(observed == label))
+                    continue
+                else:
+                    continue
+                
+#                
+#                refsets[label].add(i)
+#                testsets[observed].add(i)
+#                logging.info('observed: ' + observed + " label: "  + label + " "  + listDocTestPmid[i][0] + " "  + str(observed == label))            
+#                
+#                print 'refsets[label].add(i):', refsets[label]
+                    
+#                flagJumpNextPmid = False                
+#            
+#            
+##                flagEverObservedEqualLabel = True
+#                idxTrueRec = i
+#            
+#            if listDocTestPmid[i][9] == 'e':
+#    #                refsets[label].add(i)
+#    #                testsets[observed].add(i)
+#                refsets[label].add(idxTrueRec)
+#                testsets[observed].add(idxTrueRec)
+#               
+#                flagEverObservedEqualLabel = False
+#                idxTrueRec = 0
+#            else:
+#                continue      
+#                
+#            if listDocTestPmid[i][0:8] <> tmpPmidMain:
+#                flagNewPmid = True
+#                tmpPmidMain = listDocTestPmid[i][0:8]
+#                flagJumpNextPmid = False 
+#            else:
+#                flagNewPmid = False
+#                if flagJumpNextPmid:
+#                    continue
+#
+#            flagEverObservedEqualLabel =  (observed == label)
+#            if flagEverObservedEqualLabel:
+#                flagJumpNextPmid = True
+#                refsets[label].add(i)
+#                testsets[observed].add(i)
+#                continue
+#            else:
+#                flagJumpNextPmid = False
+#                
+#
+#            if not flagJumpNextPmid:                    
+#            else flagJumpNextPmid:
+#                
+#                continue
+
+#        if True:
+#        if False:
+#        if observed <> label:
+#            print 'observed: ', "type(observed)", type(observed), observed, label, listDocTestPmid[i], observed == label
+#            logging.info('observed: ' + "type(observed) "+str(type(observed)) + " " + observed + " "  + label + " "  + listDocTestPmid[i][0] + " "  + str(observed == label))            
+#            logging.info('observed: ' + observed + " label: "  + label + " "  + listDocTestPmid[i][0] + " "  + str(observed == label))            
+#        logging.debug('fNameI Start: '+ fNameI)
+
 #    print 'testsets: ', testsets
 #    exit()
 #    print 'fPrecisionRecall(classifier, testfeats): ', nltkPrecisionRecallFMeasure2.fPrecisionRecall(classifier, featuresetsTest)
-    classifier.labels()[0], classifier.labels()[1] 
-
+    classifier.labels()[0], classifier.labels()[1] # classifier.labels()[0]:  Npa,  classifier.labels()[1]:  pat
+#    print 'classifier.labels()[0]: ', classifier.labels()[0], ' classifier.labels()[1]: ', classifier.labels()[1]
+#    exit()
+#    print 'labelPos: ', labelPos
+#    print 'refsets[labelPos], testsets[labelPos]: ', refsets[labelPos], '\n testsets[labelPos]: ',testsets[labelPos]
     posPrecision = nltk.metrics.precision(refsets[labelPos], testsets[labelPos])
     posRecall = nltk.metrics.recall(refsets[labelPos], testsets[labelPos])
     posFmeasure = nltk.metrics.f_measure(refsets[labelPos], testsets[labelPos])
@@ -341,7 +459,8 @@ def fSubprocess(idxCrossValidation):
             +','+ str(myAccruacy)\
             +'\n'
  
-        print 'myPreRecFmeaData: ', myPreRecFmeaData
+        print 'myPreRecFmeaData: \n', myPreRecFmeaData
+        logging.info('myPreRecFmeaData: \n' + myPreRecFmeaData + ' \n')            
 
         outfPreRecFmea.write(myPreRecFmeaData)
         
@@ -434,6 +553,8 @@ def fNaiveBayesTraining(numFold=10):
         outfAccuracy.write(myAccruacyData)
 
         print 'myAccruacyData: ', myAccruacyData
+        logging.info('myAccruacyData: ' + myAccruacyData)            
+        
     
     with open(dirMain+dirOutput_accuracy+typeTextPreprocess+'-PreRecFmea.csv', 'a') as outfPreRecFmea:
 #        myPreRecFmeaData = str(posPrecision) +','+ str(posRecall) +','+ str(posRmeasure) +','+ str(negPrecision) +','+ str(negRecall) +','+ str(negFmeasure) +'\n'
@@ -447,6 +568,8 @@ def fNaiveBayesTraining(numFold=10):
 #        print 'wordFeatureRatio10times: ', wordFeatureRatio10times
         ratioWordFeature = wordFeatureRatio10times/100.0
         print 'ratioWordFeature: ', ratioWordFeature
+#        logging.info('ratioWordFeature: ' + str(ratioWordFeature))
+        
 #        continue
         
         dirOutput = 'Output3_Divide'+str(ratioWordFeature)+'/'
@@ -476,10 +599,10 @@ def fNaiveBayesTraining(numFold=10):
             if flagComplements:
                 for uc in xpermutations.xuniqueCombinations(listFilesInputFilenameStem, 1):
                     listFilesInputCombinations.append([uc, list(set(listFilesInputFilenameStem).difference(uc))])
-                    print 'uc: ', type(uc), ' '.join(uc)
+#                    print 'uc: ', type(uc), ' '.join(uc)                    
                     
-                    
-                    print 'set(listFilesInputFilenameStem).difference(uc): ', set(listFilesInputFilenameStem).difference(uc)
+                    print 'uc: ', type(uc), ' '.join(uc), ' ','set(listFilesInputFilenameStem).difference(uc): ', set(listFilesInputFilenameStem).difference(uc)
+
                 print 'listFilesInputCombinations: ', type(listFilesInputCombinations), listFilesInputCombinations
             else:
             #            for uc in xpermutations.xuniqueCombinations(listFilesInputTrain, 2):
@@ -503,4 +626,4 @@ def fNaiveBayesTraining(numFold=10):
         #        logging.debug('PubmedFileTA: '+fileNamePubmedTA+' OK!')
 
 if __name__ == "__main__":
-    fNaiveBayesTraining(5)
+    fNaiveBayesTraining(numFold)
