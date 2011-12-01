@@ -52,11 +52,14 @@ def utf_8_encoder(unicode_csv_data):
 
 def fReadExcel():
     dirCwd = os.getcwd()+'/'
-#    dirInputExcel = 'Data/'
-    dirInputExcel = '/home/kimiko/Downloads/'
+#    dirInputCsv = 'Data/'
+#    dirInputCsv = '/home/kimiko/Downloads/'
+    dirInputCsv = os.path.expanduser('~')+'/'+'Downloads/'
+    logging.info('dirInputCsv: '+ dirInputCsv) # INFO:root:dirInputCsv: /home/kimiko/Downloads/
+    
     pathOutputBasename = 'Output1/'
     pathOutputDirname = os.path.expanduser('~')+'/'+pathOutputBasename
-    logging.info('pathOutputDirname: '+ pathOutputDirname)
+    logging.info('pathOutputDirname: '+ pathOutputDirname) # INFO:root:pathOutputDirname: /home/kimiko/Output1/
 #    exit() 
     
     ListInputFilename = ['intervention.csv', 'patient.csv', 'outcome.csv']
@@ -97,8 +100,8 @@ def fReadExcel():
     
     for fileOne in ListInputFilename:
         flagFirsRow = True
-#        PubmedFile= dirCwd+dirInputExcel+fileOne
-        PubmedFile= dirInputExcel+fileOne
+#        PubmedFile= dirCwd+dirInputCsv+fileOne
+        PubmedFile= dirInputCsv+fileOne
 #        print 'PubmedFile: ', PubmedFile
         logging.info('PubmedFile: '+ PubmedFile)
     #    exit()
