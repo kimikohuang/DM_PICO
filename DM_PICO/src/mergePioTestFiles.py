@@ -21,15 +21,25 @@ import shutil
 import xpermutations # http://code.activestate.com/recipes/190465-generator-for-permutations-combinations-selections/
 from crossValidation import k_fold_cross_validation
 
-logging.basicConfig(level=logging.DEBUG)
-
-logging.debug("sys.argv[0]: "+sys.argv[0])
 
 config = ConfigObj('scirev.cfg')
 
+myLevel = int(config['level'])
+
+logging.basicConfig(level=myLevel)
+
+flagLogToFile = int(config['flagLogToFile']) # 1 or 0
+
+if flagLogToFile:
+    LOG_FILENAME = '/home/kimiko/git/DM_PICO/DM_PICO/src/example.log'
+    logging.basicConfig(filename=LOG_FILENAME)
+
+logging.info("sys.argv[0]: "+sys.argv[0])
+
+
 #flagForceRefetchPubmed = int(config['flagForceRefetchPubmed'])
 numFold = int(config['numFold'])
-logging.debug("numFold: "+str(numFold))
+logging.info("numFold: "+str(numFold))
 
 if not(numFold): 
     numFold = 3
@@ -61,8 +71,10 @@ def fCreadeCrossValidationFiles(numFold):
     
     #filesInput = ['pure-doc-dx.txt', 'pure-doc-tx.txt']
     #filesInput = ['intervention.txt', 'patient.txt', 'outcome.txt']
-    listFilesInput = ['intervention.txt', 'patient.txt', 'outcome.txt']
-    print "Unique Combinations of 2 letters from :",listFilesInput
+    ListInputFilenameTxt = ['intervention.txt', 'patient.txt', 'outcome.txt']
+#    print "Unique Combinations of 2 letters from :",ListInputFil?enameTxt
+    logging.info("Unique Combinations of 2 letters from: " + ', '.join(ListInputFilenameTxt))
+#    exit()
     #for uc in xuniqueCombinations(['l','o','v','e'],2): print ''.join(uc)
     
     
@@ -76,42 +88,51 @@ def fCreadeCrossValidationFiles(numFold):
     #filesInput = [typeTextPreprocess+'patient.txt', typeTextPreprocess+'outcome.txt']
     
     
-    dirMain = ''
+#    dirMain = ''
+    dirMain = os.path.expanduser('~')+'/' # '/home/kimiko'
+    logging.info("dirMain = os.path.expanduser('~')+'/': " + dirMain)
+
     dirInput = 'Output1/'
     dirOutput = 'Output2_TestingSet/'
+    logging.info("dirOutput: " + dirOutput)
+    
     dirOutputMergeFile = 'Output2_Merge/'
     dirOutputTrain = 'Output2_TrainingSet/'
     
     
     #for typeTextPreprocess in listMyType:
-    dirCwd = os.getcwd()+'/'
-    if os.path.isdir(dirCwd+dirOutput):
+#    dirMain = os.getcwd()+'/'
+    if os.path.isdir(dirMain + dirOutput):
         try:
-    #            shutil.rmtree(LDASubDataDir, ignore_errors, onerror)
-            shutil.rmtree(dirCwd+dirOutput)
+            shutil.rmtree(dirMain+dirOutput)
+            logging.info("dirMain + dirOutput: " + dirMain + dirOutput)
+#            os.mkdir(dirMain + dirOutput)
+
         except:
             raise
-    os.mkdir(dirCwd+dirOutput)
+    os.mkdir(dirMain + dirOutput)
     
-    if os.path.isdir(dirCwd+dirOutputMergeFile):
+    if os.path.isdir(dirMain + dirOutputMergeFile):
         try:
-    #            shutil.rmtree(LDASubDataDir, ignore_errors, onerror)
-            shutil.rmtree(dirCwd+dirOutputMergeFile)
+            shutil.rmtree(dirMain+dirOutputMergeFile)
+            logging.info("dirMain + dirOutputMergeFile: " + dirMain + dirOutputMergeFile)
         except:
             raise
-    os.mkdir(dirCwd+dirOutputMergeFile)
+    os.mkdir(dirMain + dirOutputMergeFile)
     
-    if os.path.isdir(dirCwd+dirOutputTrain):
+    if os.path.isdir(dirMain + dirOutputTrain):
         try:
-    #            shutil.rmtree(LDASubDataDir, ignore_errors, onerror)
-            shutil.rmtree(dirCwd+dirOutputTrain)
+            shutil.rmtree(dirMain+dirOutputTrain)
+            logging.info("dirMain + dirOutputTrain: " + dirMain + dirOutputTrain)
         except:
             raise
-    os.mkdir(dirCwd+dirOutputTrain)
+    os.mkdir(dirMain + dirOutputTrain)
+#    exit()
     
-    for fileOne in listFilesInput:
+    for fileOne in ListInputFilenameTxt:
         outputFileNameDiff = fileOne[0:3]
-        print 'outputFileNameDiff: ', outputFileNameDiff
+#        print 'outputFileNameDiff: ', outputFileNameDiff
+        logging.info('outputFileNameDiff: '+ outputFileNameDiff)
     
         listMyWords = []
         listDoc = []
@@ -120,7 +141,8 @@ def fCreadeCrossValidationFiles(numFold):
             filePioTxt= dirMain+dirInput+typeTextPreprocess+fileOne
             with open(filePioTxt) as fTxtOrg:
                 listDocOrg = fTxtOrg.readlines()
-            print 'len(listDocOrg): ', len(listDocOrg)
+#            print 'len(listDocOrg): ', len(listDocOrg)
+            logging.info('len(listDocOrg): '+ str(len(listDocOrg)))
     
             for rowOfListDocOrg in listDocOrg:
         #                print 'rowOfListDocOrg: ', rowOfListDocOrg
@@ -131,10 +153,14 @@ def fCreadeCrossValidationFiles(numFold):
                 outf.write(rowOfListDocOrg)
                 listMyWords.extend(rowOfListDocOrg.split())
         #                listDoc.append((myData.split(),fileOne[9:11]))
-                print '(rowOfListDocOrg.split(),outputFileNameDiff): ', (outputFileNameDiff, rowOfListDocOrg.split())
+#                print '(rowOfListDocOrg.split(),outputFileNameDiff): ', (outputFileNameDiff, rowOfListDocOrg.split())
+                logging.debug('(rowOfListDocOrg.split(),outputFileNameDiff): '+ outputFileNameDiff + " - "+ str(rowOfListDocOrg.split()))
                 listDoc.append((rowOfListDocOrg.split(),outputFileNameDiff))
+#            exit()
         idxCrossValidation = 0
-        for listTrainWithDiff, listValidationWithDiff in k_fold_cross_validation(listDoc, numFold, randomize = True):
+        # def k_fold_cross_validation(X, K, randomise = False):
+#        for listTrainWithDiff, listValidationWithDiff in k_fold_cross_validation(listDoc, numFold, randomize = True):
+        for listTrainWithDiff, listValidationWithDiff in k_fold_cross_validation(listDoc, numFold, True):
     #        outputPercentageFilenameBase = typeTextPreprocess+str(idxCrossValidation)+'-Per'
             outputPercentageFilenameBase = typeTextPreprocess+str(idxCrossValidation)
             with open(dirMain+dirOutputMergeFile+typeTextPreprocess+'-'+str(idxCrossValidation)+'-Train-'+'.csv', 'a') as outfFullTrain:
@@ -148,7 +174,10 @@ def fCreadeCrossValidationFiles(numFold):
             
                     with open(dirMain+dirOutput+outputPercentageFilenameBase+'-'+outputFileNameDiff+'-Test-'+'.csv', 'wb') as outf3:
                         for oneRowOflistValidationWithDiff in listValidationWithDiff:
-                            print 'oneRowOflistValidationWithDiff: ', oneRowOflistValidationWithDiff
+#                            print 'oneRowOflistValidationWithDiff: ', oneRowOflistValidationWithDiff
+#                            print 'type(oneRowOflistValidationWithDiff): ', type(oneRowOflistValidationWithDiff)
+#                            exit()
+                            logging.debug('oneRowOflistValidationWithDiff: ' + str(oneRowOflistValidationWithDiff))
                             outf3.write(' '.join(oneRowOflistValidationWithDiff[0])+'\n')
                             outfFullTest.write(' '.join(oneRowOflistValidationWithDiff[0])+'\n')
             
