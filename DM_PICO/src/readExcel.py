@@ -51,19 +51,24 @@ def utf_8_encoder(unicode_csv_data):
 
 
 def fReadExcel():
-    dirCwd = os.getcwd()+'/'
+#    dirCwd = os.getcwd()+'/'
 #    dirInputCsv = 'Data/'
 #    dirInputCsv = '/home/kimiko/Downloads/'
-    dirInputCsv = os.path.expanduser('~')+'/'+'Downloads/'
+#    dirInputCsv = os.path.expanduser('~')+'/'+'Downloads/'
+    dirMain = os.path.expanduser('~')+'/' + 'Data/TestDir/' # '/home/kimiko'
+
+    dirInputCsv = dirMain + 'Data/'
     logging.info('dirInputCsv: '+ dirInputCsv) # INFO:root:dirInputCsv: /home/kimiko/Downloads/
     
     pathOutputBasename = 'Output1/'
-    pathOutputDirname = os.path.expanduser('~')+'/'+pathOutputBasename
+#    pathOutputDirname = os.path.expanduser('~')+'/'+pathOutputBasename
+#    logging.info('pathOutputDirname: '+ pathOutputDirname) # INFO:root:pathOutputDirname: /home/kimiko/Output1/
+    pathOutputDirname = dirMain + '/' + pathOutputBasename
     logging.info('pathOutputDirname: '+ pathOutputDirname) # INFO:root:pathOutputDirname: /home/kimiko/Output1/
 #    exit() 
     
-    ListInputFilename = ['intervention.csv', 'patient.csv', 'outcome.csv']
-#    ListInputFilename = ['intervention.xls', 'patient.xls', 'outcome.xls']
+    ListInputFilenameCsv = ['intervention.csv', 'patient.csv', 'outcome.csv']
+#    ListInputFilenameCsv = ['intervention.xls', 'patient.xls', 'outcome.xls']
     myStopwords = nltk.corpus.stopwords.words('english')
     ListNormalMethod = ['stpwRemoved', 'wnl', 'porter', 'lancaster']
     
@@ -98,7 +103,7 @@ def fReadExcel():
             raise
     os.mkdir(pathOutputDirname)
     
-    for fileOne in ListInputFilename:
+    for fileOne in ListInputFilenameCsv:
         flagFirsRow = True
 #        PubmedFile= dirCwd+dirInputCsv+fileOne
         PubmedFile= dirInputCsv+fileOne
