@@ -89,7 +89,8 @@ def fCreadeCrossValidationFiles(numFold):
     
     
 #    dirMain = ''
-    dirMain = os.path.expanduser('~')+'/' # '/home/kimiko'
+#    dirMain = os.path.expanduser('~')+'/' # '/home/kimiko'
+    dirMain = os.path.expanduser('~')+'/' + 'Data/TestDir/' # '/home/kimiko'    
     logging.info("dirMain = os.path.expanduser('~')+'/': " + dirMain)
 
     dirInput = 'Output1/'
@@ -102,28 +103,27 @@ def fCreadeCrossValidationFiles(numFold):
     
     #for typeTextPreprocess in listMyType:
 #    dirMain = os.getcwd()+'/'
+    logging.info("dirMain + dirOutput: " + dirMain + dirOutput)
     if os.path.isdir(dirMain + dirOutput):
         try:
             shutil.rmtree(dirMain+dirOutput)
-            logging.info("dirMain + dirOutput: " + dirMain + dirOutput)
 #            os.mkdir(dirMain + dirOutput)
-
         except:
             raise
     os.mkdir(dirMain + dirOutput)
     
+    logging.info("dirMain + dirOutputMergeFile: " + dirMain + dirOutputMergeFile)
     if os.path.isdir(dirMain + dirOutputMergeFile):
         try:
             shutil.rmtree(dirMain+dirOutputMergeFile)
-            logging.info("dirMain + dirOutputMergeFile: " + dirMain + dirOutputMergeFile)
         except:
             raise
     os.mkdir(dirMain + dirOutputMergeFile)
     
+    logging.info("dirMain + dirOutputTrain: " + dirMain + dirOutputTrain)
     if os.path.isdir(dirMain + dirOutputTrain):
         try:
             shutil.rmtree(dirMain+dirOutputTrain)
-            logging.info("dirMain + dirOutputTrain: " + dirMain + dirOutputTrain)
         except:
             raise
     os.mkdir(dirMain + dirOutputTrain)
