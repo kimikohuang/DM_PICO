@@ -68,10 +68,36 @@ def fCreadeCrossValidationFiles(numFold):
     
     myRe = '((^Title: |^Abstract: )(.*))'
     p = re.compile(myRe)
+
+
+
+#    dirMain = ''
+#    dirMain = os.path.expanduser('~')+'/' # '/home/kimiko'
+    dirMain = os.path.expanduser('~')+'/' + 'Data/TestDir/' # '/home/kimiko'    
+    logging.info("dirMain = os.path.expanduser('~')+'/': " + dirMain)
+
+    dirInput = 'Output1/'
+    dirOutput = 'Output2_TestingSet/'
+    logging.info("dirOutput: " + dirOutput)
+    
+    dirOutputMergeFile = 'Output2_Merge/'
+    dirOutputTrain = 'Output2_TrainingSet/'
+    
     
     #filesInput = ['pure-doc-dx.txt', 'pure-doc-tx.txt']
     #filesInput = ['intervention.txt', 'patient.txt', 'outcome.txt']
-    ListInputFilenameTxt = ['intervention.txt', 'patient.txt', 'outcome.txt']
+    ListInputFilenameTxt = []
+#    ListInputFilenameTxt = ['intervention.txt', 'patient.txt', 'outcome.txt']
+    ListInputFilenameTxtTmp = os.listdir(dirMain + dirInput)
+    for itemOfListInputFilenameTxtTmp in ListInputFilenameTxtTmp:
+        statinfo = os.stat(dirMain + dirInput + itemOfListInputFilenameTxtTmp)
+        if statinfo.st_size > numFold*1000:
+            ListInputFilenameTxt.append(itemOfListInputFilenameTxtTmp)
+        else:
+            os.remove(dirMain + dirInput + itemOfListInputFilenameTxtTmp)
+        
+#    ListInputFilenameTxt = os.listdir(dirMain + dirInput)
+    
 #    print "Unique Combinations of 2 letters from :",ListInputFil?enameTxt
     logging.info("Unique Combinations of 2 letters from: " + ', '.join(ListInputFilenameTxt))
 #    exit()
@@ -87,18 +113,6 @@ def fCreadeCrossValidationFiles(numFold):
     #filesInput = [typeTextPreprocess+'intervention.txt', typeTextPreprocess+'outcome.txt']
     #filesInput = [typeTextPreprocess+'patient.txt', typeTextPreprocess+'outcome.txt']
     
-    
-#    dirMain = ''
-#    dirMain = os.path.expanduser('~')+'/' # '/home/kimiko'
-    dirMain = os.path.expanduser('~')+'/' + 'Data/TestDir/' # '/home/kimiko'    
-    logging.info("dirMain = os.path.expanduser('~')+'/': " + dirMain)
-
-    dirInput = 'Output1/'
-    dirOutput = 'Output2_TestingSet/'
-    logging.info("dirOutput: " + dirOutput)
-    
-    dirOutputMergeFile = 'Output2_Merge/'
-    dirOutputTrain = 'Output2_TrainingSet/'
     
     
     #for typeTextPreprocess in listMyType:
@@ -136,9 +150,11 @@ def fCreadeCrossValidationFiles(numFold):
     
         listMyWords = []
         listDoc = []
-    
+        
+        logging.info(dirMain+dirOutput+typeTextPreprocess+outputFileNameDiff+'.csv')
         with open(dirMain+dirOutput+typeTextPreprocess+outputFileNameDiff+'.csv', 'wb') as outf:
-            filePioTxt= dirMain+dirInput+typeTextPreprocess+fileOne
+#            filePioTxt= dirMain+dirInput+typeTextPreprocess+fileOne
+            filePioTxt= dirMain+dirInput + fileOne
             with open(filePioTxt) as fTxtOrg:
                 listDocOrg = fTxtOrg.readlines()
 #            print 'len(listDocOrg): ', len(listDocOrg)
