@@ -28,16 +28,12 @@ import sys
 
 config = ConfigObj('scirev.cfg')
 
-level = int(config['level'])
+#level = int(config['level'])
+myLevel = int(config['level'])
 
-#logging.basicConfig(level=level)
+logging.basicConfig(level=myLevel)
 
-LOG_FILENAME = '/home/kimiko/git/DM_PICO/DM_PICO/src/example.log'
-logging.basicConfig(filename=LOG_FILENAME,level=logging.INFO)
-
-#logging.basicConfig(level='logging.DEBUG')
-
-logging.debug("sys.argv[0]: "+sys.argv[0])
+logging.info("sys.argv[0]: "+sys.argv[0])
 
 config = ConfigObj('scirev.cfg')
 
@@ -49,6 +45,7 @@ else:
     logging.debug("numFold: "+str(numFold))
     
 flagComplements = int(config['flagComplements'])
+logging.info("flagComplements = " + str(flagComplements))
 
 wordFeatureRatioStart10times = int(config['wordFeatureRatioStart10times'])
 wordFeatureRatioStop10times = int(config['wordFeatureRatioStop10times'])
@@ -62,15 +59,22 @@ wordFeatureRatioStep10times = int(config['wordFeatureRatioStep10times'])
 #wordFeatureRatioStep10times = 5 # default =10
 
 
-dirMain = ''
+#dirMain = ''
+#dirMain = os.path.expanduser('~')+'/' # '/home/kimiko'
+dirMain = os.path.expanduser('~')+'/' + 'Data/TestDir/' # '/home/kimiko'
+
 dirInputTrainingSet = 'Output2_TrainingSet/'
 dirInputTestingSet = 'Output2_TestingSet/'
 dirOutput_accuracy = 'Output3_accuracy/'
 #dirInputTrainingSet = 'Output2Train/'
 
-dirCwd = os.getcwd()+'/'
+#dirMain = os.getcwd()+'/'
 
-listFilesInputFilenameStem = ['int', 'out', 'pat']
+#listFilesInputFilenameStem = ['int', 'out', 'pat']
+dirInput = 'Output1/'
+listFilesInputFilenameStem = []
+#    ListInputFilenameTxt = ['intervention.txt', 'patient.txt', 'outcome.txt']
+
 #listFilesInputFilenameStem = ['int', 'out']
 
 #    listMyType = ['stp-', 'wnl-', 'ptr-']
@@ -81,10 +85,10 @@ listFilesInputFilenameStem = ['int', 'out', 'pat']
 typeTextPreprocess = config['typeTextPreprocess']
 
 global_list_Word_features = []
-ratioWordFeature = 0.0
-dirOutput = ''
+global_ratioWordFeature = 0.0
+global_dirOutput = ''
 global_listDocTrain = []
-listFilesInputPair = []
+global_listFilesInputPair = []
 
 
 
@@ -118,6 +122,9 @@ def document_features_index(document):
 def fSubprocess(idxCrossValidation):
     global global_listDocTrain
     global global_list_Word_features
+    global global_listFilesInputPair
+    global global_dirOutput
+    global global_ratioWordFeature
 #for idxCrossValidation in range(0,numFold):
 #            print idxCrossValidation
     
@@ -140,13 +147,16 @@ def fSubprocess(idxCrossValidation):
     listMyWordsTrain = []
     listMyWordsTest = []
 
-    outputPercentageFilenameMiddle = 'Per'
+#    outputPercentageFilenameMiddle = 'Per'
+    outputPercentageFilenameMiddle = ''
     
-    print 'listFilesInputPair: ', listFilesInputPair
-    # listFilesInputPair:  [['pat'], ['int', 'out']]
+#    print 'global_listFilesInputPair: ', global_listFilesInputPair
+    logging.info(['global_listFilesInputPair: ', global_listFilesInputPair])
+    # global_listFilesInputPair:  [['pat'], ['int', 'out']]
 #    exit()
-    outputFileNameDiff = listFilesInputPair[0][0][0:3]
-    for listFilePair0 in listFilesInputPair:
+    outputFileNameDiff = global_listFilesInputPair[0][0][0:3]
+    logging.info("outputFileNameDiff = " + outputFileNameDiff)
+    for listFilePair0 in global_listFilesInputPair:
 #        outputFileNameDiff = listFilePair0[0][0:3]
 #        outputFileNameDiff = ''
 #        labelNaiveBayes = outputFileNameDiff
@@ -155,10 +165,12 @@ def fSubprocess(idxCrossValidation):
             labelPos = labelNaiveBayes
         else:
             labelNaiveBayes = 'N'+outputFileNameDiff[0:2]
+            logging.debug('labelNaiveBayes: ' + labelNaiveBayes) 
             labelNeg = labelNaiveBayes
 
+#        outputPercentageFilenameMiddle = outputPercentageFilenameMiddle + '-'+ labelNaiveBayes
         outputPercentageFilenameMiddle = outputPercentageFilenameMiddle + '-'+ labelNaiveBayes
-
+        logging.info('outputPercentageFilenameMiddle = ' + outputPercentageFilenameMiddle)
         for fileOne in listFilePair0:
                 
 #            fileOne = listFilePair0[0]
@@ -180,6 +192,8 @@ def fSubprocess(idxCrossValidation):
 #                print 'len(listDocOrgTrain): ', len(listDocOrgTrain), listDocOrgTrain
                 logging.debug('len(listDocOrgTrain): ' + str(len(listDocOrgTrain)) + ', listDocOrgTrain: ' + " ".join(listDocOrgTrain))
 
+
+            logging.debug('fileOneTest = ' + dirMain+dirInputTestingSet+typeTextPreprocess+str(idxCrossValidation)+'-'+fileOne+'-Test-.csv')
             fileOneTest= dirMain+dirInputTestingSet+typeTextPreprocess+str(idxCrossValidation)+'-'+fileOne+'-Test-.csv'
             with open(fileOneTest) as fTxtOrgTest:
                 listDocOrgTest = fTxtOrgTest.readlines()
@@ -198,7 +212,7 @@ def fSubprocess(idxCrossValidation):
     #                        print '(rowOfListDocOrgTrain.split(),outputFileNameDiff): ', (outputFileNameDiff, rowOfListDocOrgTrain.split())
 #                labelNaiveBayes = outputFileNameDiff
                 global_listDocTrain.append((rowOfListDocOrgTrain.split()[1:-1], labelNaiveBayes))
-    #               (for fileOne in listFilesInputPair:) END
+    #               (for fileOne in global_listFilesInputPair:) END
     
             for rowOfListDocOrgTest in listDocOrgTest:
                 listMyWordsTest.extend(rowOfListDocOrgTest.split()[1:-1])
@@ -213,20 +227,21 @@ def fSubprocess(idxCrossValidation):
 #        random.shuffle(global_listDocTrain)
 #        print 'len(listMyWordsTrain): ', len(listMyWordsTrain)
 #exit()
+    # End: for listFilePair0 in global_listFilesInputPair:
     
     allWordsTrain = nltk.FreqDist(listMyWordsTrain)
 #                allWordsTest = nltk.FreqDist(listMyWordsTest)
-    print 'type(allWordsTrain): ', type(allWordsTrain), 'len(allWordsTrain): ', len(allWordsTrain)
-    logging.info('type(allWordsTrain): ' + str(type(allWordsTrain)) + 'len(allWordsTrain): ' + str(len(allWordsTrain)))
+#    print 'type(allWordsTrain): ', type(allWordsTrain), 'len(allWordsTrain): ', len(allWordsTrain)
+    logging.debug('type(allWordsTrain): ' + str(type(allWordsTrain)) + 'len(allWordsTrain): ' + str(len(allWordsTrain)))
     
 #        global_list_Word_features = allWordsTrain.keys()[:len(allWordsTrain)/10]
-    global_list_Word_features = allWordsTrain.keys()[:int(len(allWordsTrain)*ratioWordFeature)]
+    global_list_Word_features = allWordsTrain.keys()[:int(len(allWordsTrain)*global_ratioWordFeature)]
 #    print 'allWordsTrain.keys()[-50:-1]: ', allWordsTrain.keys()[0:10], allWordsTrain.keys()[-1332:-1132]
 #    print 'allWordsTrain.keys()[-50:-1]: ', allWordsTrain.values()[-1332:-1132]
 #    print 'allWordsTrain.keys()[-50:-1]: ', allWordsTrain.hapaxes()
 #                word_features_Test = allWordsTrain.keys()[:len(allWordsTest)]
-#    print 'ratioWordFeature: ', ratioWordFeature, 'global_list_Word_features: ', len(global_list_Word_features), type(global_list_Word_features), global_list_Word_features
-    logging.info('ratioWordFeature: ' + str(ratioWordFeature) + ', global_list_Word_features: ' + str(len(global_list_Word_features)) + str(type(global_list_Word_features)))
+#    print 'global_ratioWordFeature: ', global_ratioWordFeature, 'global_list_Word_features: ', len(global_list_Word_features), type(global_list_Word_features), global_list_Word_features
+    logging.debug('global_ratioWordFeature: ' + str(global_ratioWordFeature) + ', global_list_Word_features: ' + str(len(global_list_Word_features)) + str(type(global_list_Word_features)))
     logging.debug(" ".join(global_list_Word_features))
     # global_list_Word_features:  1985 <type 'list'> ['patient', 'group', 'rate', 'day', 'n', 'treatment', 'using', 'outcome', 'week', 'clinical',
 #                exit()
@@ -236,17 +251,22 @@ def fSubprocess(idxCrossValidation):
     
     featuresetsTrain = [(document_features(d), c) for (d,c) in global_listDocTrain]
     featuresetsTest = [(document_features(d), c) for (d,c) in listDocTest]
+    # featuresetsTest[0:3]:  [({'and': False, 'is': False, 'are': True, 'in': True, 'for': False, ')': False, '(': False, 'review': False, '-': False, ',': True, '.': False, 'to': False, 'patient': False, 'wa': False, 'that': False, 'with': False, 'a': False, 'on': False, 'of': False, 'study': False, 'were': False, 'the': True, 'or': False}, 'bac'), ({'and': False, 'is': True, 'are': False, 'in': False, 'for': False, ')': False, '(': False, 'review': False, '-': False, ',': False, '.': False, 'to': True, 'patient': False, 'wa': False, 'that': False, 'with': True, 'a': False, 'on': False, 'of': True, 'study': False, 'were': False, 'the': True, 'or': False}, 'bac'), ({'and': True, 'is': True, 'are': False, 'in': False, 'for': False, ')': False, '(': False, 'review': False, '-': False, ',': True, '.': False, 'to': False, 'patient': False, 'wa': False, 'that': False, 'with': False, 'a': True, 'on': False, 'of': True, 'study': False, 'were': False, 'the': False, 'or': False}, 'bac')]
+
+#    print 'featuresetsTest[0:3]: ',featuresetsTest[0:3]
+    logging.debug(["featuresetsTest[0:1] = ", featuresetsTest[0:1]])
+#    exit()
 #        print document_features_index(d, global_list_Word_features)
 #    print '\ndocument_features(favorDiagnostic): ', document_features(favorDiagnostic)
     
 #        featuresetsTrain = [(document_features_index(d), c) for (d,c) in global_listDocTrain]
-#        print 'sys.getsizeof(featuresetsTrain): ', sys.getsizeof(featuresetsTrain), 'ratioWordFeature: ', ratioWordFeature
+#        print 'sys.getsizeof(featuresetsTrain): ', sys.getsizeof(featuresetsTrain), 'global_ratioWordFeature: ', global_ratioWordFeature
 #        print '\nfeaturesets: ', len(featuresetsTrain), featuresetsTrain[0]
 #        print '\nfeaturesets: ', len(featuresetsTrain), featuresetsTrain[1]
 #        print '\nfeaturesets: ', len(featuresetsTrain), featuresetsTrain[-1]
 
 #        featuresetsTest = [(document_features_index(d), c) for (d,c) in listDocTest]
-#        print 'sys.getsizeof(featuresetsTest): ', sys.getsizeof(featuresetsTest), 'ratioWordFeature: ', ratioWordFeature
+#        print 'sys.getsizeof(featuresetsTest): ', sys.getsizeof(featuresetsTest), 'global_ratioWordFeature: ', global_ratioWordFeature
 
 #        continue
     # featuresetsTrain(1/3):  360 [({'bolus': False, 'magnetic': False, 'colonoscopy': False ... }, 'int')
@@ -264,15 +284,15 @@ def fSubprocess(idxCrossValidation):
 
 #                with open(dirMain+dirOutputMergeFile+typeTextPreprocess+'-'+str(idxCrossValidation)+'-Train-'+'.csv', 'a') as outfFullTrain:
     with open(dirMain+dirOutput_accuracy+typeTextPreprocess+'-accuracy.csv', 'a') as outfAccuracy:
-#                    myAccruacyData = 'ratioWordFeature,' + str(ratioWordFeature) +','+ '-'.join(listFilesInputPair) + ',idxCrossValidation,' + str(idxCrossValidation)+',accuracy,' + str(nltk.classify.accuracy(classifier, featuresetsTest)) +'\n'
-#        myAccruacyData = str(ratioWordFeature) +','+ '-'.join(listFilesInputPair) +','+ str(idxCrossValidation) +','+ str(nltk.classify.accuracy(classifier, featuresetsTest)) +'\n'
-#        myAccruacyData = str(ratioWordFeature) +','+ '-'.join([listFilesInputPair[0][0], listFilesInputPair[1][0]]) +','+ str(idxCrossValidation) +','+ str(nltk.classify.accuracy(classifier, featuresetsTest)) +'\n'
-#        myAccruacyData = str(ratioWordFeature) +','+ '-'.join([listFilesInputPair[0][0], labelNaiveBayes]) +','+ str(idxCrossValidation) +','+ str(nltk.classify.accuracy(classifier, featuresetsTest)) +'\n'
+#                    myAccruacyData = 'global_ratioWordFeature,' + str(global_ratioWordFeature) +','+ '-'.join(global_listFilesInputPair) + ',idxCrossValidation,' + str(idxCrossValidation)+',accuracy,' + str(nltk.classify.accuracy(classifier, featuresetsTest)) +'\n'
+#        myAccruacyData = str(global_ratioWordFeature) +','+ '-'.join(global_listFilesInputPair) +','+ str(idxCrossValidation) +','+ str(nltk.classify.accuracy(classifier, featuresetsTest)) +'\n'
+#        myAccruacyData = str(global_ratioWordFeature) +','+ '-'.join([global_listFilesInputPair[0][0], global_listFilesInputPair[1][0]]) +','+ str(idxCrossValidation) +','+ str(nltk.classify.accuracy(classifier, featuresetsTest)) +'\n'
+#        myAccruacyData = str(global_ratioWordFeature) +','+ '-'.join([global_listFilesInputPair[0][0], labelNaiveBayes]) +','+ str(idxCrossValidation) +','+ str(nltk.classify.accuracy(classifier, featuresetsTest)) +'\n'
         myAccruacy = nltk.classify.accuracy(classifier, featuresetsTest)
-        myAccruacyData = str(ratioWordFeature) +','+ '-'.join([listFilesInputPair[0][0], labelNaiveBayes]) +','+ str(idxCrossValidation) +','+ str(myAccruacy) +'\n'
+        myAccruacyData = str(global_ratioWordFeature) +','+ '-'.join([global_listFilesInputPair[0][0], labelNaiveBayes]) +','+ str(idxCrossValidation) +','+ str(myAccruacy) +'\n'
 
-        print 'myAccruacyData: ', myAccruacyData
-        logging.info('myAccruacyData: ' + myAccruacyData)            
+#        print 'myAccruacyData: ', myAccruacyData
+        logging.debug('myAccruacyData: ' + myAccruacyData)            
 #        logging.info('observed: ' + "type(observed) "+str(type(observed)) + " " + observed + " "  + label + " "  + listDocTestPmid[i][0] + " "  + str(observed == label))            
         
 
@@ -289,6 +309,8 @@ def fSubprocess(idxCrossValidation):
     flagJumpNextPmid = False
 #    flagEverObservedEqualLabel = False
 #    idxTrueRec = 0
+#    print 'featuresetsTest: ', featuresetsTest
+
     for i, (feats, label) in enumerate(featuresetsTest):
 #        print 'feats: ', feats
 #        print 'label: ', label
@@ -303,7 +325,7 @@ def fSubprocess(idxCrossValidation):
         if len(listDocTestPmid[i][0]) <= 8:
             refsets[label].add(i)
             testsets[observed].add(i)
-            logging.info('observed: ' + observed + " label: "  + label + " "  + listDocTestPmid[i][0] + " "  + str(observed == label))            
+            logging.debug('observed: ' + observed + " label: "  + label + " "  + listDocTestPmid[i][0] + " "  + str(observed == label))            
             
 #            print 'len(listDocTestPmid[i]) == 8:'
 #            exit()
@@ -316,17 +338,18 @@ def fSubprocess(idxCrossValidation):
             if flagJumpNextPmid:
                 continue
             else:
+                print 'aaaaaaaa: ', listDocTestPmid[i][0], type(listDocTestPmid[i][0])
                 if observed == label:
                     flagJumpNextPmid = True
                     refsets[label].add(i)
                     testsets[observed].add(i)
-                    logging.info('observed: ' + observed + " label: "  + label + " "  + listDocTestPmid[i][0] + " "  + str(observed == label))
+                    logging.debug('observed: ' + observed + " label: "  + label + " "  + listDocTestPmid[i][0] + " "  + str(observed == label))
                     continue            
                 elif listDocTestPmid[i][0][9] <> 'e':
                     flagJumpNextPmid =False
                     refsets[label].add(i)
                     testsets[observed].add(i)
-                    logging.info('observed: ' + observed + " label: "  + label + " "  + listDocTestPmid[i][0] + " "  + str(observed == label))
+                    logging.debug('observed: ' + observed + " label: "  + label + " "  + listDocTestPmid[i][0] + " "  + str(observed == label))
                     continue
                 else:
                     continue
@@ -411,56 +434,56 @@ def fSubprocess(idxCrossValidation):
 
     
     with open(dirMain+dirOutput_accuracy+typeTextPreprocess+'-PreRecFmea.csv', 'a') as outfPreRecFmea:
-#        myPreRecFmeaData = str(ratioWordFeature) +','+ '-'.join([listFilesInputPair[0][0], labelNaiveBayes]) +','+ str(idxCrossValidation) +','+ str(nltk.classify.accuracy(classifier, featuresetsTest)) +'\n'
+#        myPreRecFmeaData = str(global_ratioWordFeature) +','+ '-'.join([global_listFilesInputPair[0][0], labelNaiveBayes]) +','+ str(idxCrossValidation) +','+ str(nltk.classify.accuracy(classifier, featuresetsTest)) +'\n'
 #        myPreRecFmeaData = str(posPrecision) +','+ str(posRecall) +','+ str(posFmeasure) +','+ str(negPrecision) +','+ str(negRecall) +','+ str(negFmeasure) +'\n'
-#        myPreRecFmeaData = str(ratioWordFeature) +','+ '-'.join([listFilesInputPair[0][0], labelNaiveBayes]) +','+ str(idxCrossValidation) +','+str(posPrecision) +','+ str(posRecall) +','+ str(posFmeasure) +','+ str(negPrecision) +','+ str(negRecall) +','+ str(negFmeasure) +'\n'
+#        myPreRecFmeaData = str(global_ratioWordFeature) +','+ '-'.join([global_listFilesInputPair[0][0], labelNaiveBayes]) +','+ str(idxCrossValidation) +','+str(posPrecision) +','+ str(posRecall) +','+ str(posFmeasure) +','+ str(negPrecision) +','+ str(negRecall) +','+ str(negFmeasure) +'\n'
 
         myPreRecFmeaData = \
-            str(ratioWordFeature)\
-            +','+ '-'.join([listFilesInputPair[0][0], labelNaiveBayes])\
+            str(global_ratioWordFeature)\
+            +','+ '-'.join([global_listFilesInputPair[0][0], labelNaiveBayes])\
             +','+ str(idxCrossValidation)\
             +', posPrecision'\
             +','+ str(posPrecision)\
             +'\n'\
-            +str(ratioWordFeature)\
-            +','+ '-'.join([listFilesInputPair[0][0], labelNaiveBayes])\
+            +str(global_ratioWordFeature)\
+            +','+ '-'.join([global_listFilesInputPair[0][0], labelNaiveBayes])\
             +','+ str(idxCrossValidation)\
             +', posRecall'\
             +','+ str(posRecall)\
             +'\n'\
-            +str(ratioWordFeature)\
-            +','+ '-'.join([listFilesInputPair[0][0], labelNaiveBayes])\
+            +str(global_ratioWordFeature)\
+            +','+ '-'.join([global_listFilesInputPair[0][0], labelNaiveBayes])\
             +','+ str(idxCrossValidation)\
             +', posRmeasure'\
             +','+ str(posFmeasure)\
             +'\n'\
-            +str(ratioWordFeature)\
-            +','+ '-'.join([listFilesInputPair[0][0], labelNaiveBayes])\
+            +str(global_ratioWordFeature)\
+            +','+ '-'.join([global_listFilesInputPair[0][0], labelNaiveBayes])\
             +','+ str(idxCrossValidation)\
             +', negPrecision'\
             +','+ str(negPrecision)\
             +'\n'\
-            +str(ratioWordFeature)\
-            +','+ '-'.join([listFilesInputPair[0][0], labelNaiveBayes])\
+            +str(global_ratioWordFeature)\
+            +','+ '-'.join([global_listFilesInputPair[0][0], labelNaiveBayes])\
             +','+ str(idxCrossValidation)\
             +', negRecall'\
             +','+ str(negRecall)\
             +'\n'\
-            +str(ratioWordFeature)\
-            +','+ '-'.join([listFilesInputPair[0][0], labelNaiveBayes])\
+            +str(global_ratioWordFeature)\
+            +','+ '-'.join([global_listFilesInputPair[0][0], labelNaiveBayes])\
             +','+ str(idxCrossValidation)\
             +', negFmeasure'\
             +','+ str(negFmeasure)\
             +'\n'\
-            +str(ratioWordFeature)\
-            +','+ '-'.join([listFilesInputPair[0][0], labelNaiveBayes])\
+            +str(global_ratioWordFeature)\
+            +','+ '-'.join([global_listFilesInputPair[0][0], labelNaiveBayes])\
             +','+ str(idxCrossValidation)\
             +', myAccruacy'\
             +','+ str(myAccruacy)\
             +'\n'
  
-        print 'myPreRecFmeaData: \n', myPreRecFmeaData
-        logging.info('myPreRecFmeaData: \n' + myPreRecFmeaData + ' \n')            
+#        print 'myPreRecFmeaData: \n', myPreRecFmeaData
+        logging.debug('myPreRecFmeaData: \n' + myPreRecFmeaData + ' \n')            
 
         outfPreRecFmea.write(myPreRecFmeaData)
         
@@ -471,9 +494,10 @@ def fSubprocess(idxCrossValidation):
     cpdist = classifier._feature_probdist
 #                print 'classifier.most_informative_features(10):', classifier.most_informative_features(10)
     
-#        print dirMain+dirOutput+str(idxCrossValidation)+outputPercentageFilenameMiddle+'.csv'
+#        print dirMain+global_dirOutput+str(idxCrossValidation)+outputPercentageFilenameMiddle+'.csv'
 #        exit()
-    with open(dirMain+dirOutput+typeTextPreprocess+str(idxCrossValidation)+'-'+outputPercentageFilenameMiddle+'.csv', 'wb') as outf:
+    logging.info('open wb = ' + dirMain+global_dirOutput+typeTextPreprocess+str(idxCrossValidation)+'-'+outputPercentageFilenameMiddle+'.csv')
+    with open(dirMain+global_dirOutput+typeTextPreprocess+str(idxCrossValidation)+'-'+outputPercentageFilenameMiddle+'.csv', 'wb') as outf:
         outcsv = csv.writer(outf)
         for fname, fval in classifier.most_informative_features(len(global_list_Word_features)):
             def labelprob(l):
@@ -513,17 +537,24 @@ def fSubprocess(idxCrossValidation):
 
 def fNaiveBayesTraining(numFold=10):
     global global_list_Word_features
-    global ratioWordFeature
-    global dirOutput
-    global listFilesInputPair
+    global global_ratioWordFeature
+    global global_dirOutput
+    global global_listFilesInputPair
     
     
     
     myRe = '((^Title: |^Abstract: )(.*))'
     p = re.compile(myRe)
+
+    listFilesInputFilenameStemTmp = os.listdir(dirMain + dirInput)
+    for itemOflistFilesInputFilenameStemTmp in listFilesInputFilenameStemTmp:
+        listFilesInputFilenameStem.append(itemOflistFilesInputFilenameStemTmp[0:-4])
+
+
+
     
-    #listFilesInputPair = ['pure-doc-dx.txt', 'pure-doc-tx.txt']
-    #listFilesInputPair = ['intervention.txt', 'patient.txt', 'outcome.txt']
+    #global_listFilesInputPair = ['pure-doc-dx.txt', 'pure-doc-tx.txt']
+    #global_listFilesInputPair = ['intervention.txt', 'patient.txt', 'outcome.txt']
     
     #for uc in xuniqueCombinations(['l','o','v','e'],2): print ''.join(uc)
     
@@ -533,55 +564,56 @@ def fNaiveBayesTraining(numFold=10):
     #                  ,[typeTextPreprocess+'intervention.txt', typeTextPreprocess+'outcome.txt']
     #                  ,[typeTextPreprocess+'patient.txt', typeTextPreprocess+'outcome.txt']
     #                  ]
-    #listFilesInputPair = [typeTextPreprocess+'intervention.txt', typeTextPreprocess+'patient.txt']
-    #listFilesInputPair = [typeTextPreprocess+'intervention.txt', typeTextPreprocess+'outcome.txt']
-    #listFilesInputPair = [typeTextPreprocess+'patient.txt', typeTextPreprocess+'outcome.txt']
+    #global_listFilesInputPair = [typeTextPreprocess+'intervention.txt', typeTextPreprocess+'patient.txt']
+    #global_listFilesInputPair = [typeTextPreprocess+'intervention.txt', typeTextPreprocess+'outcome.txt']
+    #global_listFilesInputPair = [typeTextPreprocess+'patient.txt', typeTextPreprocess+'outcome.txt']
     
     
     
 #    dirOutput_accuracy
-    if os.path.isdir(dirCwd+dirOutput_accuracy):
+    logging.info('dirMain+dirOutput_accuracy = ' + dirMain+dirOutput_accuracy)
+    if os.path.isdir(dirMain+dirOutput_accuracy):
         try:
         #            shutil.rmtree(LDASubDataDir, ignore_errors, onerror)
-            shutil.rmtree(dirCwd+dirOutput_accuracy)
+            shutil.rmtree(dirMain+dirOutput_accuracy)
         except:
             raise
-    os.mkdir(dirCwd+dirOutput_accuracy)
+    os.mkdir(dirMain+dirOutput_accuracy)
 
     with open(dirMain+dirOutput_accuracy+typeTextPreprocess+'-accuracy.csv', 'a') as outfAccuracy:
-        myAccruacyData = 'ratioWordFeature,' + 'listFilesInputPair,' + 'idxCrossValidation,' + 'accuracy\n'
+        myAccruacyData = 'global_ratioWordFeature,' + 'global_listFilesInputPair,' + 'idxCrossValidation,' + 'accuracy\n'
         outfAccuracy.write(myAccruacyData)
 
-        print 'myAccruacyData: ', myAccruacyData
-        logging.info('myAccruacyData: ' + myAccruacyData)            
+#        print 'myAccruacyData: ', myAccruacyData
+        logging.debug('myAccruacyData: ' + myAccruacyData)            
         
     
     with open(dirMain+dirOutput_accuracy+typeTextPreprocess+'-PreRecFmea.csv', 'a') as outfPreRecFmea:
 #        myPreRecFmeaData = str(posPrecision) +','+ str(posRecall) +','+ str(posRmeasure) +','+ str(negPrecision) +','+ str(negRecall) +','+ str(negFmeasure) +'\n'
-#        myPreRecFmeaData = 'ratioWordFeature,' + 'listFilesInputPair,' + 'idxCrossValidation,' + 'posPrecision,'+ 'posRecall,'+ 'posRmeasure,'+ 'negPrecision,'+ 'negRecall,'+ 'negFmeasure\n'
-        myPreRecFmeaData = 'ratioWordFeature,' + 'listFilesInputPair,' + 'idxCrossValidation,' + 'testType,'+ 'testValue\n'
+#        myPreRecFmeaData = 'global_ratioWordFeature,' + 'global_listFilesInputPair,' + 'idxCrossValidation,' + 'posPrecision,'+ 'posRecall,'+ 'posRmeasure,'+ 'negPrecision,'+ 'negRecall,'+ 'negFmeasure\n'
+        myPreRecFmeaData = 'global_ratioWordFeature,' + 'global_listFilesInputPair,' + 'idxCrossValidation,' + 'testType,'+ 'testValue\n'
         outfPreRecFmea.write(myPreRecFmeaData)
 
     
 #    wordFeatureRatio10times = 0.1
     for wordFeatureRatio10times in range(wordFeatureRatioStart10times,wordFeatureRatioStop10times, wordFeatureRatioStep10times):
 #        print 'wordFeatureRatio10times: ', wordFeatureRatio10times
-        ratioWordFeature = wordFeatureRatio10times/100.0
-        print 'ratioWordFeature: ', ratioWordFeature
-#        logging.info('ratioWordFeature: ' + str(ratioWordFeature))
+        global_ratioWordFeature = wordFeatureRatio10times/100.0
+#        print 'global_ratioWordFeature: ', global_ratioWordFeature
+        logging.info('global_ratioWordFeature: ' + str(global_ratioWordFeature))
         
 #        continue
         
-        dirOutput = 'Output3_Divide'+str(ratioWordFeature)+'/'
+        global_dirOutput = 'Output3_Divide'+str(global_ratioWordFeature)+'/'
         
         #for typeTextPreprocess in listMyType:
-        if os.path.isdir(dirCwd+dirOutput):
+        if os.path.isdir(dirMain+global_dirOutput):
             try:
         #            shutil.rmtree(LDASubDataDir, ignore_errors, onerror)
-                shutil.rmtree(dirCwd+dirOutput)
+                shutil.rmtree(dirMain+global_dirOutput)
             except:
                 raise
-        os.mkdir(dirCwd+dirOutput)
+        os.mkdir(dirMain+global_dirOutput)
 
 # ================================================================================================================
         for idxCrossValidation in range(0,numFold):
@@ -598,25 +630,37 @@ def fNaiveBayesTraining(numFold=10):
 #            flagComplements = True
             if flagComplements:
                 for uc in xpermutations.xuniqueCombinations(listFilesInputFilenameStem, 1):
-                    listFilesInputCombinations.append([uc, list(set(listFilesInputFilenameStem).difference(uc))])
+#                    listFilesInputCombinations.append([uc, list(set(listFilesInputFilenameStem).difference(uc))])
+                    listRemoveUc = list(listFilesInputFilenameStem)
+                    listRemoveUc.remove(uc[0])
+#                    print listRemoveUc
+                    
+                    logging.debug([uc, listRemoveUc])
+                    listFilesInputCombinations.append([uc, listRemoveUc])
+                    
+
+#                    listFilesInputCombinations.append([uc, list(listFilesInputFilenameStem).remove('intervention')])
 #                    print 'uc: ', type(uc), ' '.join(uc)                    
                     
-                    print 'uc: ', type(uc), ' '.join(uc), ' ','set(listFilesInputFilenameStem).difference(uc): ', set(listFilesInputFilenameStem).difference(uc)
-
-                print 'listFilesInputCombinations: ', type(listFilesInputCombinations), listFilesInputCombinations
+#                    print 'uc if flagComplements: ', type(uc), ' '.join(uc), ' ','set(listFilesInputFilenameStem).difference(uc): ', set(listFilesInputFilenameStem).difference(uc)
+#                    logging.debug(['uc = ', uc, 'set(listFilesInputFilenameStem).difference(uc): ', set(listFilesInputFilenameStem).difference(uc)])
+#                print 'listFilesInputCombinations: ', type(listFilesInputCombinations), listFilesInputCombinations
+#                logging.debug(['idxCrossValidation = ', str(idxCrossValidation), 'listFilesInputCombinations', listFilesInputCombinations])
             else:
             #            for uc in xpermutations.xuniqueCombinations(listFilesInputTrain, 2):
                 for uc in xpermutations.xuniqueCombinations(listFilesInputFilenameStem, 2):
 #                    listFilesInputCombinations.append(uc)
                     listFilesInputCombinations.append([[uc[0]], [uc[1]]])
-                    print 'uc: ', type(uc), uc
+#                    print 'uc if flagComplements else: ', type(uc), uc
+                    logging.debug(['uc if flagComplements else: ', type(uc), uc])
                 print '\nlistFilesInputCombinations: ', type(listFilesInputCombinations), listFilesInputCombinations
 #                exit()
 #                for uc in xpermutations.xuniqueCombinations(listFilesInputFilenameStem, 2):
 #            exit()            
-
-            for listFilesInputPair in listFilesInputCombinations:    
-            
+#            print "listFilesInputCombinations = ", listFilesInputCombinations
+#            listFilesInputCombinations = []
+            for global_listFilesInputPair in listFilesInputCombinations:    
+#                logging.info(['global_listFilesInputPair = ', global_listFilesInputPair])
                 p = Process(target=fSubprocess, args=(idxCrossValidation,))
                 p.start()
                 #dicCorpus = parent_conn.recv()
