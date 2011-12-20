@@ -1,14 +1,38 @@
 #!/usr/bin/python
-'''
+"""
 subprocess4Pico.py
 Input:
     './labelNaiveBayes/(wnl|stp)-(\d)-(int|out|pat)-(Test|Train)-.csv'
+    Filename: DM_PICO/src/readMedline.py
+        global_DirMain+InputFilename+'/'+'pubmed_result_Ab_Pmid.txt'
+            21922966    background : investment in innovative mental health care ser
+            21922966    economic evaluation is essential to ensure that such an inve
+            21922966    method : a non - systematic review of mental health evaluati
+    Filename: mergePioTestFiles.py
+        Input:
+            /Output1/stp-intervention.txt
+            /Output1/stp-patient.txt
+            /Output1/stp-outcome.txt
+        Output:
+            /Output2_Merge/wnl-d-(test|train)-.csv
+            /Output2_TestingSet/wnl-(0)-(background)-Test-.csv
+            /Output2_TrainingSet/wnl-(0)-(background)-Train-.csv
+
+            '(stp-(int|out|pat).csv)'
+            '(/Output2/stp-(\d)-Per-(int|out|pat)-(Test|Train)-.txt)'
 Output:
+    /Output3_accuracy/
+        wnl--accuracy.csv
+        wnl--PreRecFmea.csv
+        wnl--PreRecFmea1.csv
+    /Output3_Divide0.02/
+        wnl-(0)-(background).csv
+        
     './Output3_Divide0.31/(wnl|stp)-(\d)-Per-(int|out|pat)-(Nin|Nou|Npa|int|out|pat).csv'
     typeTextPreprocess+'Percentage' + '-'+ filesInput[4:7]
     Output3_Divide2
     test git branch
-'''
+"""
 
 #import writeConfigObj
 
@@ -154,6 +178,7 @@ def fSubprocess(idxCrossValidation):
     logging.info(['global_listFilesInputPair: ', global_listFilesInputPair])
     # global_listFilesInputPair:  [['pat'], ['int', 'out']]
 #    exit()
+    myTestFeatureFullname = global_listFilesInputPair[0][0]
     outputFileNameDiff = global_listFilesInputPair[0][0][0:3]
     logging.info("outputFileNameDiff = " + outputFileNameDiff)
     for listFilePair0 in global_listFilesInputPair:
@@ -161,15 +186,17 @@ def fSubprocess(idxCrossValidation):
 #        outputFileNameDiff = ''
 #        labelNaiveBayes = outputFileNameDiff
         if len(listFilePair0) == 1:
-            labelNaiveBayes = listFilePair0[0][0:3]
+#            labelNaiveBayes = listFilePair0[0][0:3]
+            labelNaiveBayes = listFilePair0[0]
             labelPos = labelNaiveBayes
         else:
-            labelNaiveBayes = 'N'+outputFileNameDiff[0:2]
+#            labelNaiveBayes = 'N'+outputFileNameDiff[0:2]
+            labelNaiveBayes = 'N'+global_listFilesInputPair[0][0]
             logging.debug('labelNaiveBayes: ' + labelNaiveBayes) 
             labelNeg = labelNaiveBayes
 
 #        outputPercentageFilenameMiddle = outputPercentageFilenameMiddle + '-'+ labelNaiveBayes
-        outputPercentageFilenameMiddle = outputPercentageFilenameMiddle + '-'+ labelNaiveBayes
+        outputPercentageFilenameMiddle = myTestFeatureFullname
         logging.info('outputPercentageFilenameMiddle = ' + outputPercentageFilenameMiddle)
         for fileOne in listFilePair0:
                 
@@ -186,6 +213,7 @@ def fSubprocess(idxCrossValidation):
     #            fileOneTrain= dirMain+dirInputTrainingSet+typeTextPreprocess+fileOne
     #                    fileOneTrain= dirMain+dirInputTrainingSet+fileOne+'-Train-.csv'
     
+            logging.debug("fileOneTrain= " + dirMain+dirInputTrainingSet+typeTextPreprocess+str(idxCrossValidation)+'-'+fileOne+'-Train-.csv')
             fileOneTrain= dirMain+dirInputTrainingSet+typeTextPreprocess+str(idxCrossValidation)+'-'+fileOne+'-Train-.csv'
             with open(fileOneTrain) as fTxtOrgTrain:
                 listDocOrgTrain = fTxtOrgTrain.readlines()
@@ -416,8 +444,8 @@ def fSubprocess(idxCrossValidation):
     classifier.labels()[0], classifier.labels()[1] # classifier.labels()[0]:  Npa,  classifier.labels()[1]:  pat
 #    print 'classifier.labels()[0]: ', classifier.labels()[0], ' classifier.labels()[1]: ', classifier.labels()[1]
 #    exit()
-#    print 'labelPos: ', labelPos
-#    print 'refsets[labelPos], testsets[labelPos]: ', refsets[labelPos], '\n testsets[labelPos]: ',testsets[labelPos]
+    print 'labelPos: ', labelPos
+    print 'refsets[labelPos], testsets[labelPos]: ', refsets[labelPos], '\n testsets[labelPos]: ',testsets[labelPos]
     posPrecision = nltk.metrics.precision(refsets[labelPos], testsets[labelPos])
     posRecall = nltk.metrics.recall(refsets[labelPos], testsets[labelPos])
     posFmeasure = nltk.metrics.f_measure(refsets[labelPos], testsets[labelPos])
@@ -432,58 +460,126 @@ def fSubprocess(idxCrossValidation):
 #    print 'neg recall:', nltk.metrics.recall(refsets['neg'], testsets['neg'])
 #    print 'neg F-measure:', nltk.metrics.f_measure(refsets['neg'], testsets['neg'])
 
+    myCsv = csv.writer(open(dirMain+dirOutput_accuracy+typeTextPreprocess+'-PreRecFmea1.csv', 'a'),dialect='excel')
+
+    myListTmp = [global_ratioWordFeature, global_listFilesInputPair[0][0], idxCrossValidation , 'posPrecision', posPrecision]
+    logging.info(['myListTmp', myListTmp])
+    myCsv.writerow(myListTmp)
+#    logging.info(myListTmp)
+#    exit()
+    
+    myListTmp = [global_ratioWordFeature, global_listFilesInputPair[0][0], idxCrossValidation , 'posRecall', posRecall]
+    myCsv.writerow(myListTmp)
+    
+    myListTmp = [global_ratioWordFeature, global_listFilesInputPair[0][0], idxCrossValidation , 'posRmeasure', posFmeasure]
+    myCsv.writerow(myListTmp)
+    
+    myListTmp = [global_ratioWordFeature, global_listFilesInputPair[0][0], idxCrossValidation , 'negPrecision', negPrecision]
+    myCsv.writerow(myListTmp)
+    
+    myListTmp = [global_ratioWordFeature, global_listFilesInputPair[0][0], idxCrossValidation , 'negRecall', negRecall]
+    myCsv.writerow(myListTmp)
+    
+    myListTmp = [global_ratioWordFeature, global_listFilesInputPair[0][0], idxCrossValidation , 'negFmeasure', negFmeasure]
+    myCsv.writerow(myListTmp)
+    
+    myListTmp = [global_ratioWordFeature, global_listFilesInputPair[0][0], idxCrossValidation , 'myAccruacy', myAccruacy]
+    myCsv.writerow(myListTmp)
     
     with open(dirMain+dirOutput_accuracy+typeTextPreprocess+'-PreRecFmea.csv', 'a') as outfPreRecFmea:
 #        myPreRecFmeaData = str(global_ratioWordFeature) +','+ '-'.join([global_listFilesInputPair[0][0], labelNaiveBayes]) +','+ str(idxCrossValidation) +','+ str(nltk.classify.accuracy(classifier, featuresetsTest)) +'\n'
 #        myPreRecFmeaData = str(posPrecision) +','+ str(posRecall) +','+ str(posFmeasure) +','+ str(negPrecision) +','+ str(negRecall) +','+ str(negFmeasure) +'\n'
 #        myPreRecFmeaData = str(global_ratioWordFeature) +','+ '-'.join([global_listFilesInputPair[0][0], labelNaiveBayes]) +','+ str(idxCrossValidation) +','+str(posPrecision) +','+ str(posRecall) +','+ str(posFmeasure) +','+ str(negPrecision) +','+ str(negRecall) +','+ str(negFmeasure) +'\n'
 
-        myPreRecFmeaData = \
-            str(global_ratioWordFeature)\
-            +','+ '-'.join([global_listFilesInputPair[0][0], labelNaiveBayes])\
-            +','+ str(idxCrossValidation)\
-            +', posPrecision'\
-            +','+ str(posPrecision)\
+#        myPreRecFmeaData = \
+#            str(global_ratioWordFeature)\
+#            +','+ '-'.join([global_listFilesInputPair[0][0], labelNaiveBayes])\
+#            +','+ str(idxCrossValidation)\
+#            +', posPrecision'\
+#            +','+ str(posPrecision)\
+#            +'\n'\
+#            +str(global_ratioWordFeature)\
+#            +','+ '-'.join([global_listFilesInputPair[0][0], labelNaiveBayes])\
+#            +','+ str(idxCrossValidation)\
+#            +', posRecall'\
+#            +','+ str(posRecall)\
+#            +'\n'\
+#            +str(global_ratioWordFeature)\
+#            +','+ '-'.join([global_listFilesInputPair[0][0], labelNaiveBayes])\
+#            +','+ str(idxCrossValidation)\
+#            +', posRmeasure'\
+#            +','+ str(posFmeasure)\
+#            +'\n'\
+#            +str(global_ratioWordFeature)\
+#            +','+ '-'.join([global_listFilesInputPair[0][0], labelNaiveBayes])\
+#            +','+ str(idxCrossValidation)\
+#            +', negPrecision'\
+#            +','+ str(negPrecision)\
+#            +'\n'\
+#            +str(global_ratioWordFeature)\
+#            +','+ '-'.join([global_listFilesInputPair[0][0], labelNaiveBayes])\
+#            +','+ str(idxCrossValidation)\
+#            +', negRecall'\
+#            +','+ str(negRecall)\
+#            +'\n'\
+#            +str(global_ratioWordFeature)\
+#            +','+ '-'.join([global_listFilesInputPair[0][0], labelNaiveBayes])\
+#            +','+ str(idxCrossValidation)\
+#            +', negFmeasure'\
+#            +','+ str(negFmeasure)\
+#            +'\n'\
+#            +str(global_ratioWordFeature)\
+#            +','+ '-'.join([global_listFilesInputPair[0][0], labelNaiveBayes])\
+#            +','+ str(idxCrossValidation)\
+#            +', myAccruacy'\
+#            +','+ str(myAccruacy)\
+#            +'\n'
+ 
+        myPreRecFmeaData = str(global_ratioWordFeature) \
+            +','+ global_listFilesInputPair[0][0] \
+            +','+ str(idxCrossValidation) \
+            +',posPrecision' \
+            +','+ str(posPrecision) \
             +'\n'\
             +str(global_ratioWordFeature)\
-            +','+ '-'.join([global_listFilesInputPair[0][0], labelNaiveBayes])\
-            +','+ str(idxCrossValidation)\
-            +', posRecall'\
-            +','+ str(posRecall)\
-            +'\n'\
-            +str(global_ratioWordFeature)\
-            +','+ '-'.join([global_listFilesInputPair[0][0], labelNaiveBayes])\
-            +','+ str(idxCrossValidation)\
-            +', posRmeasure'\
-            +','+ str(posFmeasure)\
-            +'\n'\
-            +str(global_ratioWordFeature)\
-            +','+ '-'.join([global_listFilesInputPair[0][0], labelNaiveBayes])\
-            +','+ str(idxCrossValidation)\
-            +', negPrecision'\
-            +','+ str(negPrecision)\
-            +'\n'\
-            +str(global_ratioWordFeature)\
-            +','+ '-'.join([global_listFilesInputPair[0][0], labelNaiveBayes])\
-            +','+ str(idxCrossValidation)\
-            +', negRecall'\
-            +','+ str(negRecall)\
-            +'\n'\
-            +str(global_ratioWordFeature)\
-            +','+ '-'.join([global_listFilesInputPair[0][0], labelNaiveBayes])\
-            +','+ str(idxCrossValidation)\
-            +', negFmeasure'\
-            +','+ str(negFmeasure)\
-            +'\n'\
-            +str(global_ratioWordFeature)\
-            +','+ '-'.join([global_listFilesInputPair[0][0], labelNaiveBayes])\
-            +','+ str(idxCrossValidation)\
-            +', myAccruacy'\
-            +','+ str(myAccruacy)\
+            +','+ global_listFilesInputPair[0][0] \
+            +','+ str(idxCrossValidation) \
+            +',posRecall' \
+            +','+ str(posRecall) \
+            +'\n' \
+            +str(global_ratioWordFeature) \
+            +','+ global_listFilesInputPair[0][0] \
+            +','+ str(idxCrossValidation) \
+            +',posRmeasure' \
+            +','+ str(posFmeasure) \
+            +'\n' \
+            +str(global_ratioWordFeature) \
+            +','+ global_listFilesInputPair[0][0] \
+            +','+ str(idxCrossValidation) \
+            +',negPrecision' \
+            +','+ str(negPrecision) \
+            +'\n' \
+            +str(global_ratioWordFeature) \
+            +','+ global_listFilesInputPair[0][0] \
+            +','+ str(idxCrossValidation) \
+            +',negRecall' \
+            +','+ str(negRecall) \
+            +'\n' \
+            +str(global_ratioWordFeature) \
+            +','+ global_listFilesInputPair[0][0] \
+            +','+ str(idxCrossValidation) \
+            +',negFmeasure' \
+            +','+ str(negFmeasure) \
+            +'\n' \
+            +str(global_ratioWordFeature) \
+            +','+ global_listFilesInputPair[0][0] \
+            +','+ str(idxCrossValidation) \
+            +',myAccruacy' \
+            +','+ str(myAccruacy) \
             +'\n'
  
-#        print 'myPreRecFmeaData: \n', myPreRecFmeaData
         logging.debug('myPreRecFmeaData: \n' + myPreRecFmeaData + ' \n')            
+#        print 'myPreRecFmeaData: \n', myPreRecFmeaData
 
         outfPreRecFmea.write(myPreRecFmeaData)
         
@@ -496,8 +592,11 @@ def fSubprocess(idxCrossValidation):
     
 #        print dirMain+global_dirOutput+str(idxCrossValidation)+outputPercentageFilenameMiddle+'.csv'
 #        exit()
-    logging.info('open wb = ' + dirMain+global_dirOutput+typeTextPreprocess+str(idxCrossValidation)+'-'+outputPercentageFilenameMiddle+'.csv')
-    with open(dirMain+global_dirOutput+typeTextPreprocess+str(idxCrossValidation)+'-'+outputPercentageFilenameMiddle+'.csv', 'wb') as outf:
+#    logging.info('open wb = ' + dirMain+global_dirOutput+typeTextPreprocess+str(idxCrossValidation)+'-'+outputPercentageFilenameMiddle+'.csv')
+#    with open(dirMain+global_dirOutput+typeTextPreprocess+str(idxCrossValidation)+'-'+outputPercentageFilenameMiddle+'.csv', 'wb') as outf:
+    logging.info('open wb = ' + dirMain+global_dirOutput+typeTextPreprocess+str(idxCrossValidation)+'-'+myTestFeatureFullname+'.csv')
+    with open(dirMain+global_dirOutput+typeTextPreprocess+str(idxCrossValidation)+'-'+myTestFeatureFullname+'.csv', 'wb') as outf:
+        
         outcsv = csv.writer(outf)
         for fname, fval in classifier.most_informative_features(len(global_list_Word_features)):
             def labelprob(l):
@@ -578,21 +677,28 @@ def fNaiveBayesTraining(numFold=10):
             shutil.rmtree(dirMain+dirOutput_accuracy)
         except:
             raise
-    os.mkdir(dirMain+dirOutput_accuracy)
+    os.mkdir(dirMain+dirOutput_accuracy)    
 
     with open(dirMain+dirOutput_accuracy+typeTextPreprocess+'-accuracy.csv', 'a') as outfAccuracy:
         myAccruacyData = 'global_ratioWordFeature,' + 'global_listFilesInputPair,' + 'idxCrossValidation,' + 'accuracy\n'
         outfAccuracy.write(myAccruacyData)
 
 #        print 'myAccruacyData: ', myAccruacyData
-        logging.debug('myAccruacyData: ' + myAccruacyData)            
-        
+        logging.debug('myAccruacyData: ' + myAccruacyData)
+                
     
     with open(dirMain+dirOutput_accuracy+typeTextPreprocess+'-PreRecFmea.csv', 'a') as outfPreRecFmea:
 #        myPreRecFmeaData = str(posPrecision) +','+ str(posRecall) +','+ str(posRmeasure) +','+ str(negPrecision) +','+ str(negRecall) +','+ str(negFmeasure) +'\n'
 #        myPreRecFmeaData = 'global_ratioWordFeature,' + 'global_listFilesInputPair,' + 'idxCrossValidation,' + 'posPrecision,'+ 'posRecall,'+ 'posRmeasure,'+ 'negPrecision,'+ 'negRecall,'+ 'negFmeasure\n'
         myPreRecFmeaData = 'global_ratioWordFeature,' + 'global_listFilesInputPair,' + 'idxCrossValidation,' + 'testType,'+ 'testValue\n'
         outfPreRecFmea.write(myPreRecFmeaData)
+
+
+#    myCsv = csv.writer(open(dirMain+dirOutput_accuracy+typeTextPreprocess+'-PreRecFmea1.csv', 'a'), dialect='excel')
+    myCsv = csv.writer(open(dirMain+dirOutput_accuracy+typeTextPreprocess+'-PreRecFmea1.csv', 'wb'), dialect='excel')
+#    myListTmp = [global_ratioWordFeature, global_listFilesInputPair[0][0], idxCrossValidation , 'posPrecision', posPrecision]
+    myListTmp = ['global_ratioWordFeature1', 'global_listFilesInputPair', 'idxCrossValidation', 'testType', 'testValue']
+    myCsv.writerow(myListTmp)
 
     
 #    wordFeatureRatio10times = 0.1
@@ -659,6 +765,10 @@ def fNaiveBayesTraining(numFold=10):
 #            exit()            
 #            print "listFilesInputCombinations = ", listFilesInputCombinations
 #            listFilesInputCombinations = []
+
+            
+            
+            
             for global_listFilesInputPair in listFilesInputCombinations:    
 #                logging.info(['global_listFilesInputPair = ', global_listFilesInputPair])
                 p = Process(target=fSubprocess, args=(idxCrossValidation,))
