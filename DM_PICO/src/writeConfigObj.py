@@ -27,20 +27,20 @@ def fwriteConfigObj():
 #    config['level'] = logging.DEBUG     # 10
     config['level'] = logging.INFO      # 20
     print "config['level']: ", config['level']
-    config['numFold'] = 3
+    config['flagLogToFile'] = 0 # 1 or 0
+    config['numFold'] = 2
     config['flagComplements'] = 1 # 1 or 0
     config['flagOnlyTrainingUsingExistingData'] = 0 # 1 or 0
     config['flagNaiveBayesTraining'] = 0 # 1 or 0
     
-    
-    config['wordFeatureRatioStart10times'] = 1
-    config['wordFeatureRatioStop10times'] = 14
+    config['wordFeatureRatioStart10times'] = 2
+    config['wordFeatureRatioStop10times'] = 4
     config['wordFeatureRatioStep10times'] = 1
 
     config['InputFileFormat'] = 'readMedline' # readExcel, readMedline  
     
     config['InputFileLocation'] = "/home/kimiko/Downloads"  
-    config['InputFilename'] = "pubmed_result(11).txt"  
+    config['InputFilename'] = "pubmed_result (3).txt"  
 
 #wordFeatureRatioStart10times = 21 # default = 3
 #wordFeatureRatioStop10times = 27 # default =10 not include

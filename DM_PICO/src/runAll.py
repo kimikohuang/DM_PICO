@@ -21,31 +21,35 @@ import writeConfigObj
 import sys
 from configobj import ConfigObj
 import readExcel
+import readMedline
 import mergePioTestFiles
 #import readPIO5
 #import pioNaiveBayes
 #import subprocess4Pico
 import subprocess4Pico3
 
-logging.basicConfig(level=logging.DEBUG)
-
-#print sys.argv[0]
-logging.debug("sys.argv[0]: "+sys.argv[0])
-
-writeConfigObj.fwriteConfigObj()
-
+#writeConfigObj.fwriteConfigObj()
 config = ConfigObj('scirev.cfg')
 
+myLevel = int(config['level'])
+
+logging.basicConfig(level=myLevel)
+
+logging.info("config.filename: "+sys.argv[0])
+
 numFold = int(config['numFold'])
-logging.debug("config.filename: "+sys.argv[0])
 
-readExcel.fReadExcel()
+InputFileFormat = config['InputFileFormat'] # = 'readMedline' # readExcel, readMedline
+logging.info('InputFileFormat = ' + InputFileFormat)
+
+
+if InputFileFormat == 'readExcel':
+    readExcel.fReadExcel()
+elif InputFileFormat == 'readMedline':
+    readMedline.fReadMedline()
+
 mergePioTestFiles.fCreadeCrossValidationFiles(numFold)
-#pioNaiveBayes.fNaiveBayesTraining(numFold)
-#subprocess4Pico.fNaiveBayesTraining(numFold)
 subprocess4Pico3.fNaiveBayesTraining(numFold)
-
-
 
 
 

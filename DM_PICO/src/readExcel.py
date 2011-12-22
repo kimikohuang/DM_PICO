@@ -1,9 +1,11 @@
 #!/usr/bin/python
 '''
+Filename:
+    DM_PICO/src/readExcel.py
 Input:
-    'intervention.csv'
-    , 'patient.csv'
-    , 'outcome.csv'
+    'Data/intervention.csv'
+    , 'Data/patient.csv'
+    , 'Data/outcome.csv'
 Output:
     /Output1/(stp|wnl)-intervention.txt
     /Output1/(stp|wnl)-patient.txt
@@ -30,7 +32,7 @@ logging.basicConfig(level=myLevel)
 
 #logging.basicConfig(level='logging.DEBUG')
 
-logging.debug("sys.argv[0]: "+sys.argv[0])
+logging.info("sys.argv[0]: "+sys.argv[0])
 
 
 #portfolio = csv.reader(open('/home/kimiko/output.csv', "rb"))
@@ -63,7 +65,7 @@ def fReadExcel():
     pathOutputBasename = 'Output1/'
 #    pathOutputDirname = os.path.expanduser('~')+'/'+pathOutputBasename
 #    logging.info('pathOutputDirname: '+ pathOutputDirname) # INFO:root:pathOutputDirname: /home/kimiko/Output1/
-    pathOutputDirname = dirMain + '/' + pathOutputBasename
+    pathOutputDirname = dirMain + pathOutputBasename
     logging.info('pathOutputDirname: '+ pathOutputDirname) # INFO:root:pathOutputDirname: /home/kimiko/Output1/
 #    exit() 
     
@@ -108,7 +110,7 @@ def fReadExcel():
 #        PubmedFile= dirCwd+dirInputCsv+fileOne
         PubmedFile= dirInputCsv+fileOne
 #        print 'PubmedFile: ', PubmedFile
-        logging.info('PubmedFile: '+ PubmedFile)
+        logging.info('open rb PubmedFile: '+ PubmedFile)
     #    exit()
         
         iteObj = unicode_csv_reader(open(PubmedFile, "rb"), dialect='excel')
@@ -120,11 +122,13 @@ def fReadExcel():
     #    with open('wnl-'+PubmedFile[0:-4]+'.txt', 'w') as training:
 #        print "dirCwd+pathOutputBasename+myType+fileOne[0:-4]+'.txt': ", dirCwd+pathOutputBasename+myType+fileOne[0:-4]+'.txt'
 #        print "pathOutputDirname+myType+fileOne[0:-4]+'.txt': ", pathOutputDirname+myType+fileOne[0:-4]+'.txt'
-        logging.info("pathOutputDirname+myType+fileOne[0:-4]+'.txt': "+ pathOutputDirname+myType+fileOne[0:-4]+'.txt')
+#        logging.info("pathOutputDirname+myType+fileOne[0:-4]+'.txt': "+ pathOutputDirname+myType+fileOne[0:-4]+'.txt')
 #        exit()
 #        pathOutputDirname
 #        with open(dirCwd+pathOutputBasename+myType+fileOne[0:-4]+'.txt', 'w') as training:
-        with open(pathOutputDirname+myType+fileOne[0:-4]+'.txt', 'w') as training:
+#        with open(pathOutputDirname+myType+fileOne[0:-4]+'.txt', 'w') as training:
+        logging.info('open w: ' + pathOutputDirname + fileOne[0:-4]+'.txt')
+        with open(pathOutputDirname + fileOne[0:-4]+'.txt', 'w') as training:
             for row in iteObj: # http://love-python.blogspot.com/2008/02/read-csv-file-in-python.html
             #    names.append((data[0], data[1]))
             #    print ', '.join(row)

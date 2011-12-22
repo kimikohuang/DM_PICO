@@ -1,5 +1,7 @@
 #!/usr/bin/python
 '''
+Filename:
+    mergePioTestFiles.py
 Input:
     /Output1/stp-intervention.txt
     /Output1/stp-patient.txt
@@ -77,8 +79,8 @@ def fCreadeCrossValidationFiles(numFold):
     logging.info("dirMain = os.path.expanduser('~')+'/': " + dirMain)
 
     dirInput = 'Output1/'
-    dirOutput = 'Output2_TestingSet/'
-    logging.info("dirOutput: " + dirOutput)
+    dirOutputTest = 'Output2_TestingSet/'
+    logging.info("dirOutputTest: " + dirOutputTest)
     
     dirOutputMergeFile = 'Output2_Merge/'
     dirOutputTrain = 'Output2_TrainingSet/'
@@ -91,7 +93,7 @@ def fCreadeCrossValidationFiles(numFold):
     ListInputFilenameTxtTmp = os.listdir(dirMain + dirInput)
     for itemOfListInputFilenameTxtTmp in ListInputFilenameTxtTmp:
         statinfo = os.stat(dirMain + dirInput + itemOfListInputFilenameTxtTmp)
-        if statinfo.st_size > numFold*1000:
+        if statinfo.st_size > numFold*1500:
             ListInputFilenameTxt.append(itemOfListInputFilenameTxtTmp)
         else:
             os.remove(dirMain + dirInput + itemOfListInputFilenameTxtTmp)
@@ -117,14 +119,14 @@ def fCreadeCrossValidationFiles(numFold):
     
     #for typeTextPreprocess in listMyType:
 #    dirMain = os.getcwd()+'/'
-    logging.info("dirMain + dirOutput: " + dirMain + dirOutput)
-    if os.path.isdir(dirMain + dirOutput):
+    logging.info("dirMain + dirOutputTest: " + dirMain + dirOutputTest)
+    if os.path.isdir(dirMain + dirOutputTest):
         try:
-            shutil.rmtree(dirMain+dirOutput)
-#            os.mkdir(dirMain + dirOutput)
+            shutil.rmtree(dirMain+dirOutputTest)
+#            os.mkdir(dirMain + dirOutputTest)
         except:
             raise
-    os.mkdir(dirMain + dirOutput)
+    os.mkdir(dirMain + dirOutputTest)
     
     logging.info("dirMain + dirOutputMergeFile: " + dirMain + dirOutputMergeFile)
     if os.path.isdir(dirMain + dirOutputMergeFile):
@@ -144,15 +146,16 @@ def fCreadeCrossValidationFiles(numFold):
 #    exit()
     
     for fileOne in ListInputFilenameTxt:
-        outputFileNameDiff = fileOne[0:3]
+#        outputFileNameDiff = fileOne[0:3]
+        outputFileNameDiff = fileOne[0:-4]
 #        print 'outputFileNameDiff: ', outputFileNameDiff
         logging.info('outputFileNameDiff: '+ outputFileNameDiff)
     
         listMyWords = []
         listDoc = []
         
-        logging.info(dirMain+dirOutput+typeTextPreprocess+outputFileNameDiff+'.csv')
-        with open(dirMain+dirOutput+typeTextPreprocess+outputFileNameDiff+'.csv', 'wb') as outf:
+        logging.info(dirMain+dirOutputTest+typeTextPreprocess+outputFileNameDiff+'.csv')
+        with open(dirMain+dirOutputTest+typeTextPreprocess+outputFileNameDiff+'.csv', 'wb') as outf:
 #            filePioTxt= dirMain+dirInput+typeTextPreprocess+fileOne
             filePioTxt= dirMain+dirInput + fileOne
             with open(filePioTxt) as fTxtOrg:
@@ -188,7 +191,7 @@ def fCreadeCrossValidationFiles(numFold):
                             outf2.write(' '.join(oneRowOfListTrainWithDiff[0])+'\n')
                             outfFullTrain.write(' '.join(oneRowOfListTrainWithDiff[0])+'\n')
             
-                    with open(dirMain+dirOutput+outputPercentageFilenameBase+'-'+outputFileNameDiff+'-Test-'+'.csv', 'wb') as outf3:
+                    with open(dirMain+dirOutputTest+outputPercentageFilenameBase+'-'+outputFileNameDiff+'-Test-'+'.csv', 'wb') as outf3:
                         for oneRowOflistValidationWithDiff in listValidationWithDiff:
 #                            print 'oneRowOflistValidationWithDiff: ', oneRowOflistValidationWithDiff
 #                            print 'type(oneRowOflistValidationWithDiff): ', type(oneRowOflistValidationWithDiff)

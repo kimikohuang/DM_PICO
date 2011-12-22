@@ -108,11 +108,18 @@ listFilesInputFilenameStem = []
 #typeTextPreprocess = 'ptr-'
 typeTextPreprocess = config['typeTextPreprocess']
 
+
+
+
+
+
+
 global_list_Word_features = []
 global_ratioWordFeature = 0.0
 global_dirOutput = ''
 global_listDocTrain = []
 global_listFilesInputPair = []
+global_flagHaveDoneTsxtAnotherFile = False
 
 
 
@@ -142,6 +149,40 @@ def document_features_index(document):
     return features
 
 
+# for test another test file
+InputFilename = config['InputFilename'] # = "pubmed_result(5).txt"  
+logging.info('InputFilename: '+ InputFilename)
+
+fNamePubmedTaTxt = dirMain + InputFilename + '/pubmed_result_Ab_Pmid.txt'
+logging.info('fNamePubmedTaTxt = ' + fNamePubmedTaTxt)
+
+global_listDocOrgTestAnotherFile = []
+
+with open(fNamePubmedTaTxt) as fTxtTestAnotherFile:
+    global_listDocOrgTestAnotherFile = fTxtTestAnotherFile.readlines()
+    print 'global_listDocOrgTestAnotherFile: ', type(global_listDocOrgTestAnotherFile), len(global_listDocOrgTestAnotherFile) # <type 'list'> 7563
+#exit()
+
+#    featuresetsTest = [(document_features(d), c) for (d,c) in listDocTest]
+listDocTestAnotherFile = []
+listDocTestPmidAnotherFile = []
+for rowOfGlobal_listDocOrgTestAnotherFile in global_listDocOrgTestAnotherFile:
+#                listMyWordsTest.extend(rowOfListDocOrgTest.split()[1:-1])
+#                listDocTest.append((rowOfListDocOrgTest.split(), outputFileNameDiff))
+#    listDocTest.append((rowOfListDocOrgTest.split()[1:-1], labelNaiveBayes))
+#    listDocTestPmid.append((rowOfListDocOrgTest.split()[0], labelNaiveBayes))
+#    listDocTestAnotherFile.append((rowOfGlobal_listDocOrgTestAnotherFile.split()[1:-1], "labelNaiveBayes"))
+    listDocTestAnotherFile.append(rowOfGlobal_listDocOrgTestAnotherFile.split()[1:-1])
+#    listDocTestPmidAnotherFile.append((rowOfGlobal_listDocOrgTestAnotherFile.split()[0], "labelNaiveBayes"))
+    listDocTestPmidAnotherFile.append(rowOfGlobal_listDocOrgTestAnotherFile.split()[0])
+
+    
+
+print 'type(listDocTestAnotherFile): ', type(listDocTestAnotherFile), listDocTestAnotherFile[0:2]
+print 'type(listDocTestAnotherFile[0]): ', type(listDocTestAnotherFile[0]), listDocTestAnotherFile[0]
+#exit()
+
+
 #def fSubprocess(fileNamePubmedTA, PubmedFile, flagNeedAbstract):
 def fSubprocess(idxCrossValidation):
     global global_listDocTrain
@@ -149,6 +190,9 @@ def fSubprocess(idxCrossValidation):
     global global_listFilesInputPair
     global global_dirOutput
     global global_ratioWordFeature
+    global global_listDocOrgTestAnotherFile
+    global global_flagHaveDoneTsxtAnotherFile
+
 #for idxCrossValidation in range(0,numFold):
 #            print idxCrossValidation
     
@@ -169,13 +213,14 @@ def fSubprocess(idxCrossValidation):
     listDocTestPmid = []
     
     listMyWordsTrain = []
-    listMyWordsTest = []
+#    listMyWordsTest = []
 
 #    outputPercentageFilenameMiddle = 'Per'
     outputPercentageFilenameMiddle = ''
     
 #    print 'global_listFilesInputPair: ', global_listFilesInputPair
     logging.info(['global_listFilesInputPair: ', global_listFilesInputPair])
+#    INFO:root:['global_listFilesInputPair: ', [['objective'], ['method', 'conclusion', 'result', 'background', 'summary']]]
     # global_listFilesInputPair:  [['pat'], ['int', 'out']]
 #    exit()
     myTestFeatureFullname = global_listFilesInputPair[0][0]
@@ -189,11 +234,15 @@ def fSubprocess(idxCrossValidation):
 #            labelNaiveBayes = listFilePair0[0][0:3]
             labelNaiveBayes = listFilePair0[0]
             labelPos = labelNaiveBayes
+            logging.info('labelPos: ' + labelPos)
+            # INFO:root:labelPos: objective
         else:
 #            labelNaiveBayes = 'N'+outputFileNameDiff[0:2]
             labelNaiveBayes = 'N'+global_listFilesInputPair[0][0]
             logging.debug('labelNaiveBayes: ' + labelNaiveBayes) 
             labelNeg = labelNaiveBayes
+            logging.info('labelNeg: ' + labelNeg)
+            # INFO:root:labelNeg: Nobjective
 
 #        outputPercentageFilenameMiddle = outputPercentageFilenameMiddle + '-'+ labelNaiveBayes
         outputPercentageFilenameMiddle = myTestFeatureFullname
@@ -228,7 +277,7 @@ def fSubprocess(idxCrossValidation):
     #                    print 'len(listDocOrgText): ', len(listDocOrgTrain), listDocOrgTrain
             
 #            print 'fileOneTrain: ', fileOneTrain, 'fileOneTest: ', fileOneTest
-            
+
     
             for rowOfListDocOrgTrain in listDocOrgTrain:
     #                print 'rowOfListDocOrgTrain: ', rowOfListDocOrgTrain
@@ -243,12 +292,13 @@ def fSubprocess(idxCrossValidation):
     #               (for fileOne in global_listFilesInputPair:) END
     
             for rowOfListDocOrgTest in listDocOrgTest:
-                listMyWordsTest.extend(rowOfListDocOrgTest.split()[1:-1])
+#                listMyWordsTest.extend(rowOfListDocOrgTest.split()[1:-1])
 #                listDocTest.append((rowOfListDocOrgTest.split(), outputFileNameDiff))
                 listDocTest.append((rowOfListDocOrgTest.split()[1:-1], labelNaiveBayes))
                 listDocTestPmid.append((rowOfListDocOrgTest.split()[0], labelNaiveBayes))
 
-
+#                global_listDocOrgTestAnotherFile
+        # End of for fileOne in listFilePair0:
 #    print 'type(global_listDocTrain): ', type(global_listDocTrain), 'len(global_listDocTrain): ', len(global_listDocTrain)
 #    print 'global_listDocTrain[0]: ', global_listDocTrain[0]
 #    print 'global_listDocTrain[1]: ', global_listDocTrain[-1]
@@ -279,11 +329,24 @@ def fSubprocess(idxCrossValidation):
     
     featuresetsTrain = [(document_features(d), c) for (d,c) in global_listDocTrain]
     featuresetsTest = [(document_features(d), c) for (d,c) in listDocTest]
-    # featuresetsTest[0:3]:  [({'and': False, 'is': False, 'are': True, 'in': True, 'for': False, ')': False, '(': False, 'review': False, '-': False, ',': True, '.': False, 'to': False, 'patient': False, 'wa': False, 'that': False, 'with': False, 'a': False, 'on': False, 'of': False, 'study': False, 'were': False, 'the': True, 'or': False}, 'bac'), ({'and': False, 'is': True, 'are': False, 'in': False, 'for': False, ')': False, '(': False, 'review': False, '-': False, ',': False, '.': False, 'to': True, 'patient': False, 'wa': False, 'that': False, 'with': True, 'a': False, 'on': False, 'of': True, 'study': False, 'were': False, 'the': True, 'or': False}, 'bac'), ({'and': True, 'is': True, 'are': False, 'in': False, 'for': False, ')': False, '(': False, 'review': False, '-': False, ',': True, '.': False, 'to': False, 'patient': False, 'wa': False, 'that': False, 'with': False, 'a': True, 'on': False, 'of': True, 'study': False, 'were': False, 'the': False, 'or': False}, 'bac')]
+    # featuresetsTest[0:3]:  [
+        #({'and': False, 'is': False, 'are': True, 'in': True, 'for': False, ')': False, '(': False, 'review': False, '-': False, ',': True, '.': False, 'to': False, 'patient': False, 'wa': False, 'that': False, 'with': False, 'a': False, 'on': False, 'of': False, 'study': False, 'were': False, 'the': True, 'or': False}, 'bac'), 
+        #({'and': False, 'is': True, 'are': False, 'in': False, 'for': False, ')': False, '(': False, 'review': False, '-': False, ',': False, '.': False, 'to': True, 'patient': False, 'wa': False, 'that': False, 'with': True, 'a': False, 'on': False, 'of': True, 'study': False, 'were': False, 'the': True, 'or': False}, 'bac'), 
+        #({'and': True, 'is': True, 'are': False, 'in': False, 'for': False, ')': False, '(': False, 'review': False, '-': False, ',': True, '.': False, 'to': False, 'patient': False, 'wa': False, 'that': False, 'with': False, 'a': True, 'on': False, 'of': True, 'study': False, 'were': False, 'the': False, 'or': False}, 'bac')]
 
 #    print 'featuresetsTest[0:3]: ',featuresetsTest[0:3]
     logging.debug(["featuresetsTest[0:1] = ", featuresetsTest[0:1]])
 #    exit()
+
+    #featuresetsTest = [(document_features(d), c) for (d,c) in listDocTest]
+#    dicFeaturesetsTestAnotherFile = [(document_features(d), c) for (d,c) in listDocTestAnotherFile]
+#    dicFeaturesetsTestAnotherFile = [(document_features(d), labelNaiveBayes) for (d,c) in listDocTestAnotherFile]
+#        dicFeaturesetsTestAnotherFile = document_features(myRow)
+#    dicFeaturesetsTestAnotherFile = document_features(d) for d in listDocTestAnotherFile
+#    print 'dicFeaturesetsTestAnotherFile: ', type(dicFeaturesetsTestAnotherFile), dicFeaturesetsTestAnotherFile[0:2]
+#    exit()
+
+
 #        print document_features_index(d, global_list_Word_features)
 #    print '\ndocument_features(favorDiagnostic): ', document_features(favorDiagnostic)
     
@@ -306,6 +369,51 @@ def fSubprocess(idxCrossValidation):
 #                train_set, test_set = featuresetsTrain[sizeTest:], featuresetsTrain[:sizeTest]
 #                classifier = nltk.NaiveBayesClassifier.train(train_set)
     classifier = nltk.NaiveBayesClassifier.train(featuresetsTrain)
+
+    if global_flagHaveDoneTsxtAnotherFile:
+        print 'if global_flagHaveDoneTsxtAnotherFile:'
+    else:
+#        global_flagHaveDoneTsxtAnotherFile = True
+#        guess = classifier.classify({'and': False, 'hypothermia': True, 'p': False, 'is': True, 'brain': True, 'mild': False, 'at': False, 'in': True, 'group': False, 'wa': False, 'for': True, '0': False, ')': True, '(': True, 'that': False, '-': False, ',': False, '.': False, '1': False, 'to': False, 'cooling': True, '2': False, '5': False, 'treatment': False, ';': False, 'injury': True, '=': False, 'be': False, 'head': True, 'patient': False, 'degree': False, 'traumatic': False, 'after': False, 'effect': False, '3': False, 'tbi': False, 'outcome': False, 'from': False, 'with': True, 'by': False, 'temperature': False, 'a': True, 'on': False, 'c': False, 'moderate': False, 'hour': False, 'this': False, 'of': True, 'study': False, 'cerebral': False, 'severe': False, 'induced': False, 'were': False, 'the': False, 'therapeutic': True, 'or': True, '),': False})
+#        print 'guess: ', guess
+    
+    #    dict([(idxListDocTestAnotherFile, idxListDocTestAnotherFile**2) for idxListDocTestAnotherFile in (2, 4, 6)]) # http://docs.python.org/tutorial/datastructures.html
+#        print type(listDocTestAnotherFile[0]), listDocTestAnotherFile[0]
+        
+#        print document_features(listDocTestAnotherFile[0])
+    #    for idxListDocTestAnotherFile in listDocTestAnotherFile:
+        for idxListDocTestAnotherFile in range(0,len(listDocTestAnotherFile)):
+    #        document_features(idxListDocTestAnotherFile)
+    #        guess = classifier.classify(document_features(idxListDocTestAnotherFile))
+            guess = classifier.classify(document_features(listDocTestAnotherFile[idxListDocTestAnotherFile]))
+            myPmid = listDocTestPmidAnotherFile[idxListDocTestAnotherFile]
+            
+        if guess == labelPos:
+            logging.info('guess: ' + guess + ', myPmid:' + myPmid)
+            
+            with open(dirMain+dirOutput_accuracy+typeTextPreprocess+'-pmid.csv', 'a') as outfPmid:
+                outfPmid.write('guess: ' + guess + ', myPmid:' + myPmid +' : ' + ' '.join(listDocTestAnotherFile[idxListDocTestAnotherFile]) + '\n')
+            
+         
+#    for myRow in listDocTestAnotherFile:
+#        print type(myRow), myRow
+#        guess = classifier.classify({'and': False, 'hypothermia': True, 'p': False, 'is': True, 'brain': True, 'mild': False, 'at': False, 'in': True, 'group': False, 'wa': False, 'for': True, '0': False, ')': True, '(': True, 'that': False, '-': False, ',': False, '.': False, '1': False, 'to': False, 'cooling': True, '2': False, '5': False, 'treatment': False, ';': False, 'injury': True, '=': False, 'be': False, 'head': True, 'patient': False, 'degree': False, 'traumatic': False, 'after': False, 'effect': False, '3': False, 'tbi': False, 'outcome': False, 'from': False, 'with': True, 'by': False, 'temperature': False, 'a': True, 'on': False, 'c': False, 'moderate': False, 'hour': False, 'this': False, 'of': True, 'study': False, 'cerebral': False, 'severe': False, 'induced': False, 'were': False, 'the': False, 'therapeutic': True, 'or': True, '),': False})
+        
+    # http://nltk.googlecode.com/svn/trunk/doc/book/ch06.html
+#    print 'len(dicFeaturesetsTestAnotherFile): ', len(dicFeaturesetsTestAnotherFile)
+#    print 'dicFeaturesetsTestAnotherFile[0]: ', dicFeaturesetsTestAnotherFile
+#    guess = classifier.classify(dicFeaturesetsTestAnotherFile)
+#    print 'guess: ', guess
+#    for idxDicFeaturesetsTestAnotherFile in range(0,len(dicFeaturesetsTestAnotherFile)):
+#        guess = classifier.classify(dicFeaturesetsTestAnotherFile)
+    
+#        print 'guess: ', idxDicFeaturesetsTestAnotherFile, guess
+#    listDocTest.append((rowOfListDocOrgTest.split()[1:-1], labelNaiveBayes))
+#    for idxTestAnotherFile in range(0,len(global_listDocOrgTestAnotherFile)):
+        # guess = classifier.classify(gender_features(name))
+#        print "type(global_listDocOrgTestAnotherFile): ", type(global_listDocOrgTestAnotherFile), global_listDocOrgTestAnotherFile[0:2][1:3]
+#        guess = classifier.classify(global_listDocOrgTestAnotherFile[idxTestAnotherFile][1:-1])
+#        print 'guess: ', idxTestAnotherFile, guess
 #    print 'classifier.labels(): ', classifier.labels(), classifier.labels()[0], classifier.labels()[1] 
 #    exit()
 
@@ -338,9 +446,11 @@ def fSubprocess(idxCrossValidation):
 #    flagEverObservedEqualLabel = False
 #    idxTrueRec = 0
 #    print 'featuresetsTest: ', featuresetsTest
+    # featuresetsTest:  [({'and': False, 'cooling': False, 'hypothermia': False, 'is':
 
     for i, (feats, label) in enumerate(featuresetsTest):
-#        print 'feats: ', feats
+#        print 'feats: ', type(feats), feats
+        # feats:  <type 'dict'> {'and': False, 'cooling': False, 'hypothermia': False, 'is
 #        print 'label: ', label
 #        print 'refsets[label]: ', type(refsets[label]), refsets[label]
 #        exit()
@@ -685,7 +795,11 @@ def fNaiveBayesTraining(numFold=10):
 
 #        print 'myAccruacyData: ', myAccruacyData
         logging.debug('myAccruacyData: ' + myAccruacyData)
-                
+        
+        
+    with open(dirMain+dirOutput_accuracy+typeTextPreprocess+'-pmid.csv', 'wb') as outfPmid:
+        outfPmid.write('First line:\n')
+
     
     with open(dirMain+dirOutput_accuracy+typeTextPreprocess+'-PreRecFmea.csv', 'a') as outfPreRecFmea:
 #        myPreRecFmeaData = str(posPrecision) +','+ str(posRecall) +','+ str(posRmeasure) +','+ str(negPrecision) +','+ str(negRecall) +','+ str(negFmeasure) +'\n'
