@@ -119,9 +119,7 @@ global_ratioWordFeature = 0.0
 global_dirOutput = ''
 global_listDocTrain = []
 global_listFilesInputPair = []
-global_flagHaveDoneTsxtAnotherFile = False
-
-
+global_flagTestAnotherTestFile = config['testAnotherMedlineFile']['flagSentenceSplitter'] # 1 or 0
 
 
 def document_features(document):
@@ -191,7 +189,7 @@ def fSubprocess(idxCrossValidation):
     global global_dirOutput
     global global_ratioWordFeature
     global global_listDocOrgTestAnotherFile
-    global global_flagHaveDoneTsxtAnotherFile
+    global global_flagTestAnotherTestFile
 
 #for idxCrossValidation in range(0,numFold):
 #            print idxCrossValidation
@@ -370,10 +368,9 @@ def fSubprocess(idxCrossValidation):
 #                classifier = nltk.NaiveBayesClassifier.train(train_set)
     classifier = nltk.NaiveBayesClassifier.train(featuresetsTrain)
 
-    if global_flagHaveDoneTsxtAnotherFile:
-        print 'if global_flagHaveDoneTsxtAnotherFile:'
-    else:
-#        global_flagHaveDoneTsxtAnotherFile = True
+    if global_flagTestAnotherTestFile:
+
+#        global_flagTestAnotherTestFile = True
 #        guess = classifier.classify({'and': False, 'hypothermia': True, 'p': False, 'is': True, 'brain': True, 'mild': False, 'at': False, 'in': True, 'group': False, 'wa': False, 'for': True, '0': False, ')': True, '(': True, 'that': False, '-': False, ',': False, '.': False, '1': False, 'to': False, 'cooling': True, '2': False, '5': False, 'treatment': False, ';': False, 'injury': True, '=': False, 'be': False, 'head': True, 'patient': False, 'degree': False, 'traumatic': False, 'after': False, 'effect': False, '3': False, 'tbi': False, 'outcome': False, 'from': False, 'with': True, 'by': False, 'temperature': False, 'a': True, 'on': False, 'c': False, 'moderate': False, 'hour': False, 'this': False, 'of': True, 'study': False, 'cerebral': False, 'severe': False, 'induced': False, 'were': False, 'the': False, 'therapeutic': True, 'or': True, '),': False})
 #        print 'guess: ', guess
     
@@ -393,7 +390,6 @@ def fSubprocess(idxCrossValidation):
             
             with open(dirMain+dirOutput_accuracy+typeTextPreprocess+'-pmid.csv', 'a') as outfPmid:
                 outfPmid.write('guess: ' + guess + ', myPmid:' + myPmid +' : ' + ' '.join(listDocTestAnotherFile[idxListDocTestAnotherFile]) + '\n')
-            
          
 #    for myRow in listDocTestAnotherFile:
 #        print type(myRow), myRow

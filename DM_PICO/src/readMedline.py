@@ -99,7 +99,7 @@ def fReadMedline():
     global global_DirMain
 
     config = ConfigObj('scirev.cfg')
-    flagSentenceSplitter = int(config['readRIS']['flagSentenceSplitter']) # 1 or 0
+    flagSentenceSplitter = int(config['testAnotherMedlineFile']['flagSentenceSplitter']) # 1 or 0
     
 #    print sys.argv[0]
 #    global_DirMain ='DrLiu/'
