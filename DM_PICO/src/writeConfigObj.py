@@ -5,6 +5,7 @@ input
     NlpClinical_papers.txt
 output
     scirev.cfg
+    local develop branch test.
 """
 
 from configobj import ConfigObj
