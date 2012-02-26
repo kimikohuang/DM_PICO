@@ -31,6 +31,7 @@ def fwriteConfigObj():
     config['numFold'] = 2
     config['flagComplements'] = 1 # 1 or 0
     config['flagOnlyTrainingUsingExistingData'] = 0 # 1 or 0
+    
     config['flagNaiveBayesTraining'] = 0 # 1 or 0
     
     config['wordFeatureRatioStart10times'] = 2
@@ -53,7 +54,10 @@ def fwriteConfigObj():
 #typeTextPreprocess = 'ptr-'
     config['typeTextPreprocess'] = 'wnl-'
 
-
+    config['testAnotherMedlineFile'] = {}
+    config['testAnotherMedlineFile']['flagSentenceSplitter'] = 1 # 1 or 0
+    
+        
     config['readRIS'] = {}
     config['readRIS']['flagSentenceSplitter'] = 1 # 1 or 0
     
