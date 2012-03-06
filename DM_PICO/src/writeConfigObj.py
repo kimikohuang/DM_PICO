@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # Filename: writeConfigObj.py
 """
+Filename 
+    writeConfigObj.py
 input
     NlpClinical_papers.txt
 output

@@ -38,17 +38,19 @@ Output:
 
 #writeConfigObj.fwriteConfigObj()
 
-import logging
-from configobj import ConfigObj
+import sys
 import os
 import re
-import nltk
+from configobj import ConfigObj
 import csv
 import shutil
-import xpermutations # http://code.activestate.com/recipes/190465-generator-for-permutations-combinations-selections/
-from multiprocessing import Process
 import collections
-import sys
+
+from multiprocessing import Process
+import logging
+import nltk
+
+import xpermutations # http://code.activestate.com/recipes/190465-generator-for-permutations-combinations-selections/
 
 config = ConfigObj('scirev.cfg')
 
